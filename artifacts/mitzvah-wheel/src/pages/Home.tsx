@@ -94,7 +94,7 @@ export default function Home() {
         {/* Left Column: Wheel + Result */}
         <div className="lg:col-span-7 flex flex-col items-center justify-start space-y-6">
 
-          <div className="bg-white/50 p-6 md:p-8 rounded-[2rem] shadow-xl border border-primary/20 w-full max-w-[500px] backdrop-blur-sm">
+          <div className="bg-white/50 p-4 rounded-[2rem] shadow-2xl border border-white/60 w-full backdrop-blur-sm">
             <Wheel
               items={displayItems}
               spinning={spinning}

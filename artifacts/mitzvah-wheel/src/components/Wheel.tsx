@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WheelProps {
   items: string[];
@@ -7,34 +7,28 @@ interface WheelProps {
   setSpinning: (spinning: boolean) => void;
 }
 
-// Rich, curated palette for the wheel segments
-const SEGMENT_COLORS = [
-  "#1a237e", // Deep Royal Blue
-  "#b71c1c", // Deep Red
-  "#f9a825", // Gold/Amber
-  "#004d40", // Emerald Green
-  "#4a148c", // Purple
-  "#006064", // Teal
-  "#e65100", // Burnt Orange
-  "#311b92", // Deep Purple
-  "#880e4f", // Magenta
-  "#01579b", // Cyan
-];
+function getRainbowColor(index: number, total: number): string {
+  const hue = (index / total) * 360;
+  return `hsl(${hue}, 90%, 52%)`;
+}
 
 export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [rotation, setRotation] = useState(0);
-  
-  // Animation refs
+
   const requestRef = useRef<number>();
   const velocityRef = useRef(0);
   const isSpinningRef = useRef(false);
   const itemsRef = useRef(items);
+  const rotationRef = useRef(rotation);
 
-  // Keep items ref synced
   useEffect(() => {
     itemsRef.current = items;
   }, [items]);
+
+  useEffect(() => {
+    rotationRef.current = rotation;
+  }, [rotation]);
 
   const drawWheel = (ctx: CanvasRenderingContext2D, rot: number) => {
     const canvas = ctx.canvas;
@@ -42,97 +36,134 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
     const ch = canvas.height;
     const cx = cw / 2;
     const cy = ch / 2;
-    const radius = Math.min(cw, ch) / 2 - 10;
+    const radius = Math.min(cw, ch) / 2 - 6;
 
     ctx.clearRect(0, 0, cw, ch);
 
     const numSegments = itemsRef.current.length;
+    if (numSegments === 0) return;
     const arc = (Math.PI * 2) / numSegments;
 
-    // Draw shadow
+    // Outer glow / shadow ring
     ctx.save();
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 10;
+    ctx.arc(cx, cy, radius + 4, 0, Math.PI * 2);
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = 28;
+    ctx.shadowOffsetY = 8;
+    ctx.fillStyle = 'rgba(0,0,0,0.01)';
     ctx.fill();
     ctx.restore();
 
+    // Draw rainbow segments
     for (let i = 0; i < numSegments; i++) {
       const angle = rot + i * arc;
-      
-      // Draw segment
+      const color = getRainbowColor(i, numSegments);
+
       ctx.beginPath();
-      ctx.fillStyle = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
+      ctx.fillStyle = color;
       ctx.moveTo(cx, cy);
       ctx.arc(cx, cy, radius, angle, angle + arc);
       ctx.lineTo(cx, cy);
       ctx.fill();
 
-      // Draw border between segments
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#f9a825'; // Gold borders
+      // White segment dividers
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, angle, angle + arc);
+      ctx.lineTo(cx, cy);
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
       ctx.stroke();
+    }
 
-      // Draw text
+    // Outer ring border
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.stroke();
+
+    // Text labels
+    for (let i = 0; i < numSegments; i++) {
+      const angle = rot + i * arc;
+
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(angle + arc / 2);
-      ctx.textAlign = "right";
-      ctx.fillStyle = "#ffffff";
-      
-      // Dynamic font size based on number of items and text length
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#ffffff';
+
       const text = itemsRef.current[i];
-      let fontSize = Math.max(12, Math.min(22, (radius * Math.PI) / numSegments - 4));
-      if (text.length > 20) fontSize -= 4;
-      
-      ctx.font = `600 ${fontSize}px 'Inter', sans-serif`;
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
-      ctx.shadowBlur = 4;
-      
-      // Truncate text if too long
+      const segArcLength = (radius * Math.PI * 2) / numSegments;
+      let fontSize = Math.max(10, Math.min(18, segArcLength / 3.2));
+      if (text.length > 22) fontSize = Math.max(10, fontSize - 3);
+
+      ctx.font = `700 ${fontSize}px 'Inter', sans-serif`;
+      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowBlur = 5;
+
+      const maxWidth = radius * 0.72;
       let displayText = text;
-      if (ctx.measureText(displayText).width > radius - 40) {
-        let maxChars = Math.floor((radius - 40) / (fontSize * 0.6));
-        displayText = text.substring(0, maxChars) + '...';
+      while (ctx.measureText(displayText).width > maxWidth && displayText.length > 4) {
+        displayText = displayText.slice(0, -4) + '...';
       }
-      
-      ctx.fillText(displayText, radius - 20, 5);
+
+      ctx.fillText(displayText, radius - 14, fontSize * 0.35);
       ctx.restore();
     }
 
-    // Draw center circle
+    // Center hub — white circle with rainbow gradient ring
+    const hubRadius = 34;
+    const hubGrad = ctx.createRadialGradient(cx, cy, hubRadius * 0.2, cx, cy, hubRadius);
+    hubGrad.addColorStop(0, '#ffffff');
+    hubGrad.addColorStop(1, '#f0f0f0');
+
     ctx.beginPath();
-    ctx.arc(cx, cy, 30, 0, Math.PI * 2);
-    ctx.fillStyle = '#f9a825'; // Gold center
+    ctx.arc(cx, cy, hubRadius, 0, Math.PI * 2);
+    ctx.fillStyle = hubGrad;
+    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = 10;
     ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#1a237e';
-    ctx.stroke();
-    
-    // Draw inner Star of David in center (simplified as two triangles)
+    ctx.shadowBlur = 0;
+
+    // Thin rainbow ring around hub
+    const ringSteps = 360;
+    for (let s = 0; s < ringSteps; s++) {
+      const a1 = (s / ringSteps) * Math.PI * 2;
+      const a2 = ((s + 1) / ringSteps) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, hubRadius + 1, a1, a2);
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = `hsl(${(s / ringSteps) * 360}, 90%, 55%)`;
+      ctx.stroke();
+    }
+
+    // Star of David in hub
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.fillStyle = '#1a237e';
-    
-    // Triangle 1
+
+    const starColor = '#1a237e';
+    const starSize = 11;
+
+    ctx.fillStyle = starColor;
+
+    // Triangle pointing up
     ctx.beginPath();
-    ctx.moveTo(0, -12);
-    ctx.lineTo(10.4, 6);
-    ctx.lineTo(-10.4, 6);
+    ctx.moveTo(0, -starSize);
+    ctx.lineTo(starSize * 0.87, starSize * 0.5);
+    ctx.lineTo(-starSize * 0.87, starSize * 0.5);
     ctx.closePath();
     ctx.fill();
-    
-    // Triangle 2
+
+    // Triangle pointing down
     ctx.beginPath();
-    ctx.moveTo(0, 12);
-    ctx.lineTo(10.4, -6);
-    ctx.lineTo(-10.4, -6);
+    ctx.moveTo(0, starSize);
+    ctx.lineTo(starSize * 0.87, -starSize * 0.5);
+    ctx.lineTo(-starSize * 0.87, -starSize * 0.5);
     ctx.closePath();
     ctx.fill();
-    
+
     ctx.restore();
   };
 
@@ -142,14 +173,12 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Handle high DPI displays
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    
+
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
-    
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
 
@@ -158,63 +187,39 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
 
   const spin = () => {
     if (isSpinningRef.current) return;
-    
+
     setSpinning(true);
     isSpinningRef.current = true;
-    
-    // Random velocity between 0.3 and 0.5 (radians per frame)
-    velocityRef.current = 0.3 + Math.random() * 0.2;
-    
+    velocityRef.current = 0.32 + Math.random() * 0.22;
+
     const animate = () => {
       setRotation((prev) => {
-        let next = prev + velocityRef.current;
-        // Keep it nicely bounded
-        return next % (Math.PI * 2);
+        const next = (prev + velocityRef.current) % (Math.PI * 2);
+        rotationRef.current = next;
+        return next;
       });
-      
-      // Decelerate
-      velocityRef.current *= 0.985;
-      
+
+      velocityRef.current *= 0.984;
+
       if (velocityRef.current > 0.002) {
         requestRef.current = requestAnimationFrame(animate);
       } else {
-        // Spin finished
         isSpinningRef.current = false;
         setSpinning(false);
-        
-        // Calculate result
-        // The pointer is at the top (which is -PI/2 in canvas coordinates, but our drawing logic
-        // might mean angle 0 is at the right. Actually, pointer is drawn in HTML above the canvas).
-        // Let's say pointer is at the top (12 o'clock).
-        
-        const currentRotation = (rotation + velocityRef.current) % (Math.PI * 2);
-        
-        // Due to rotation direction and starting point, calculate winning index
+
+        const currentRotation = rotationRef.current;
         const numSegments = itemsRef.current.length;
         const arc = (Math.PI * 2) / numSegments;
-        
-        // The pointer is at 270 degrees (3PI/2) standard coordinate, or -PI/2.
-        // We need to find which segment spans over that angle.
-        // Angle of segment i is currentRotation + i * arc to currentRotation + (i+1) * arc
-        
-        // Normalizing the top pointer angle to our rotation space
-        // The top of the wheel corresponds to an angle of 3PI/2 (270 degrees)
-        const pointerAngle = (Math.PI * 1.5);
-        
-        let normalizedRotation = (Math.PI * 2 - (currentRotation % (Math.PI * 2))) % (Math.PI * 2);
-        
-        // Calculate index
-        // This math aligns the pointer at top with the drawn segments
+        const pointerAngle = Math.PI * 1.5;
+        const normalizedRotation = (Math.PI * 2 - (currentRotation % (Math.PI * 2))) % (Math.PI * 2);
         let winningAngle = (pointerAngle + normalizedRotation) % (Math.PI * 2);
         let winIndex = Math.floor(winningAngle / arc);
-        
-        // Edge cases with modulo arithmetic
         if (winIndex >= numSegments) winIndex = 0;
-        
+
         onSpinComplete(itemsRef.current[winIndex]);
       }
     };
-    
+
     requestRef.current = requestAnimationFrame(animate);
   };
 
@@ -222,22 +227,38 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
     if (spinning && !isSpinningRef.current) {
       spin();
     }
-    
     return () => {
-      if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current);
-      }
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [spinning]);
 
   return (
-    <div className="relative w-full max-w-md mx-auto aspect-square flex items-center justify-center">
-      {/* Pointer */}
-      <div className="absolute -top-4 z-10 w-0 h-0 border-l-[15px] border-r-[15px] border-t-[30px] border-l-transparent border-r-transparent border-t-primary filter drop-shadow-md"></div>
-      <div className="absolute -top-4 z-10 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[25px] border-l-transparent border-r-transparent border-t-amber-300"></div>
-      
-      <canvas 
-        ref={canvasRef} 
+    <div className="relative w-full mx-auto aspect-square flex items-center justify-center">
+      {/* Pointer arrow */}
+      <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center drop-shadow-lg">
+        <div
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: '18px solid transparent',
+            borderRight: '18px solid transparent',
+            borderTop: '36px solid #1a237e',
+          }}
+        />
+        <div
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: '12px solid transparent',
+            borderRight: '12px solid transparent',
+            borderTop: '28px solid #fbbf24',
+            marginTop: '-34px',
+          }}
+        />
+      </div>
+
+      <canvas
+        ref={canvasRef}
         className="w-full h-full"
         style={{ touchAction: 'none' }}
       />
