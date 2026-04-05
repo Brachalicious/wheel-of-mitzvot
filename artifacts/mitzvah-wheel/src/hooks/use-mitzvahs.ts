@@ -1000,8 +1000,15 @@ export function getMitzvahSource(mitzvah: string): MitzvahSource | null {
 
 export function getSefariaUrl(mitzvah: string): string {
   const s = MITZVAH_SOURCES[mitzvah];
-  if (!s) return `https://www.sefaria.org/search#query=${encodeURIComponent(mitzvah)}`;
-  return `https://www.sefaria.org/${s.book}.${s.chapter}.${s.verse}`;
+  if (!s) {
+    // Strip common filler words so the search hits the actual concept
+    const clean = mitzvah
+      .replace(/^(Do not |Not to |To |The |Observe |Follow |Keep )/i, "")
+      .trim();
+    return `https://www.sefaria.org/search?q=${encodeURIComponent(clean)}&tab=text`;
+  }
+  // Sefaria canonical ref: "Leviticus.5.1" → displays bilingual by default
+  return `https://www.sefaria.org/${encodeURIComponent(s.book)}.${s.chapter}.${s.verse}?lang=bi`;
 }
 
 export function formatVerseRef(s: MitzvahSource): string {
