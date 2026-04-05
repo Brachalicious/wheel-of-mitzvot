@@ -5,6 +5,7 @@ import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
 import { DailyChecklist } from "@/components/DailyChecklist";
 import { OmerCounter } from "@/components/OmerCounter";
+import { SoulLevels } from "@/components/SoulLevels";
 import { ProgressChart } from "@/components/ProgressChart";
 import { GroupTab } from "@/components/GroupTab";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
@@ -180,9 +181,10 @@ export default function Home() {
 
       {/* Tab content */}
       {tab === "daily" && (
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          <OmerCounter />
-          <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="flex flex-col gap-4 p-4">
+            <OmerCounter />
+            <SoulLevels />
             <DailyChecklist />
           </div>
         </div>
