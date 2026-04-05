@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDailyChecklist, DailyItem } from "@/hooks/use-daily-checklist";
+import { useHebrewDate } from "@/hooks/use-hebrew-date";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,18 +14,9 @@ const CATEGORY_META: Record<DailyItem["category"], { label: string; color: strin
   tzedakah:  { label: "Tzedakah", color: "text-rose-600",   Icon: Coins },
 };
 
-function todayFormatted() {
-  return new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-}
-
-function hebrewDay() {
-  // Days of the week in Hebrew (Sunday=0)
-  const days = ["Yom Rishon", "Yom Sheni", "Yom Shelishi", "Yom Revi'i", "Yom Chamishi", "Erev Shabbat", "Shabbat"];
-  return days[new Date().getDay()];
-}
-
 export function DailyChecklist() {
   const { items, done, toggle, addItem, removeItem, resetDay } = useDailyChecklist();
+  const hdate = useHebrewDate();
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [showAdd, setShowAdd] = useState(false);
@@ -45,12 +37,15 @@ export function DailyChecklist() {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Day header */}
+      {/* Day header with Hebrew date */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-border bg-secondary/40">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold text-primary uppercase tracking-wider">{hebrewDay()}</p>
-            <p className="text-xs text-muted-foreground">{todayFormatted()}</p>
+            <p className={`text-xs font-bold uppercase tracking-wider ${hdate.isShabbat ? "text-purple-600" : hdate.isErevShabbat ? "text-amber-600" : "text-primary"}`}>
+              {hdate.dayOfWeek}
+            </p>
+            <p className="text-sm font-semibold text-foreground">{hdate.formatted}</p>
+            <p className="text-xs text-muted-foreground">{hdate.gregorianFormatted}</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
@@ -71,7 +66,11 @@ export function DailyChecklist() {
         {/* Progress bar */}
         <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-primary to-green-500 rounded-full transition-all duration-500"
+            className={`h-full rounded-full transition-all duration-500 ${
+              hdate.isShabbat
+                ? "bg-gradient-to-r from-purple-400 to-purple-600"
+                : "bg-gradient-to-r from-primary to-green-500"
+            }`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -94,15 +93,12 @@ export function DailyChecklist() {
                 }`}
                 data-testid={`daily-item-${item.id}`}
               >
-                {/* Checkbox */}
                 <div className="flex-shrink-0 mt-0.5">
                   {isDone
                     ? <CheckCircle2 className="w-5 h-5 text-green-600" />
                     : <Circle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   }
                 </div>
-
-                {/* Text */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={`text-sm font-semibold leading-tight ${isDone ? "line-through text-muted-foreground" : "text-foreground"}`}>
@@ -118,8 +114,6 @@ export function DailyChecklist() {
                     </p>
                   )}
                 </div>
-
-                {/* Remove button (custom items only on hover) */}
                 <button
                   onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
                   className={`flex-shrink-0 mt-0.5 transition-opacity text-muted-foreground hover:text-destructive ${
@@ -132,12 +126,11 @@ export function DailyChecklist() {
             );
           })}
 
-          {/* Add custom item */}
           {showAdd ? (
             <form onSubmit={handleAdd} className="p-3 border border-primary/30 rounded-lg bg-primary/5 space-y-2">
               <Input
                 autoFocus
-                placeholder="Mitzvah name (e.g. Omer count)"
+                placeholder="Mitzvah name (e.g. Count the Omer)"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 className="h-8 text-sm"
@@ -163,7 +156,7 @@ export function DailyChecklist() {
               className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-muted-foreground/30 rounded-lg text-xs text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              Add a custom mitzvah
+              Add a custom mitzvah to today's checklist
             </button>
           )}
         </div>

@@ -1,16 +1,10 @@
-import { useMemo } from "react";
-import { useMitzvahs } from "@/hooks/use-mitzvahs";
-import { useCompletedMitzvahs } from "@/hooks/use-mitzvahs";
-import { MITZVAH_SOURCES } from "@/hooks/use-mitzvahs";
+import { useMemo, useState } from "react";
+import { useMitzvahs, useCompletedMitzvahs, MITZVAH_SOURCES } from "@/hooks/use-mitzvahs";
+import { useGroup, encodeProgress } from "@/hooks/use-group";
+import { useHebrewDate } from "@/hooks/use-hebrew-date";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle2, TrendingUp, Award } from "lucide-react";
-
-const POSITIVE_COLOR = "bg-blue-500";
-const NEGATIVE_COLOR = "bg-amber-500";
-
-function isNegative(name: string) {
-  return name.startsWith("Do not") || name.startsWith("Don't");
-}
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, TrendingUp, Award, Share2, Copy, Check, Users } from "lucide-react";
 
 const PARSHA_ORDER = [
   "Noach", "Lech Lecha", "Vayishlach",
@@ -21,20 +15,25 @@ const PARSHA_ORDER = [
   "Tehillim / Hallel",
 ];
 
+function isNegative(name: string) {
+  return name.startsWith("Do not") || name.startsWith("Don't");
+}
+
 export function ProgressChart() {
   const { mitzvahs, isLoaded } = useMitzvahs();
   const { completed } = useCompletedMitzvahs();
+  const { myName } = useGroup();
+  const hdate = useHebrewDate();
+  const [copied, setCopied] = useState(false);
 
   const stats = useMemo(() => {
     const positive = mitzvahs.filter((m) => !isNegative(m));
     const negative = mitzvahs.filter((m) => isNegative(m));
-
     const positiveDone = positive.filter((m) => completed.has(m)).length;
     const negativeDone = negative.filter((m) => completed.has(m)).length;
     const totalDone = completed.size;
     const pct = mitzvahs.length > 0 ? (totalDone / mitzvahs.length) * 100 : 0;
 
-    // Group by Parsha
     const parshaMap: Record<string, { total: number; done: number }> = {};
     for (const [name, src] of Object.entries(MITZVAH_SOURCES)) {
       if (!mitzvahs.includes(name)) continue;
@@ -43,15 +42,8 @@ export function ProgressChart() {
       parshaMap[p].total++;
       if (completed.has(name)) parshaMap[p].done++;
     }
+    const parshaStats = PARSHA_ORDER.filter((p) => parshaMap[p]).map((p) => ({ parsha: p, ...parshaMap[p] }));
 
-    const parshaStats = PARSHA_ORDER
-      .filter((p) => parshaMap[p])
-      .map((p) => ({ parsha: p, ...parshaMap[p] }));
-
-    // Top completed mitzvot — just list them
-    const topCompleted = [...completed].slice(0, 10);
-
-    // Letter breakdown
     const letterMap: Record<string, { total: number; done: number }> = {};
     for (const m of mitzvahs) {
       const key = m.replace(/^Do not |^Don't /, "");
@@ -66,16 +58,65 @@ export function ProgressChart() {
       .filter((l) => l.done > 0)
       .slice(0, 8);
 
+    const topCompleted = [...completed].slice(0, 10);
+
     return { positive, negative, positiveDone, negativeDone, totalDone, pct, parshaStats, topCompleted, letterStats };
   }, [mitzvahs, completed]);
 
-  if (!isLoaded) return <div className="flex items-center justify-center h-full text-muted-foreground text-sm">Loading…</div>;
+  const handleShare = () => {
+    const name = myName || "Anonymous";
+    const code = encodeProgress(name, stats.totalDone, mitzvahs.length);
+    const text = [
+      `Wheel of Mitzvot — ${hdate.formatted}`,
+      `${name}: ${stats.totalDone}/${mitzvahs.length} mitzvot (${stats.pct.toFixed(1)}%)`,
+      `${stats.positiveDone} positive mitzvot performed`,
+      `${stats.negativeDone} negative commandments observed`,
+      ``,
+      `Share code: ${code}`,
+    ].join("\n");
+
+    if (navigator.share) {
+      navigator.share({ title: "My Mitzvah Progress", text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  if (!isLoaded) return (
+    <div className="flex items-center justify-center h-full text-muted-foreground text-sm">Loading…</div>
+  );
 
   const { totalDone, pct, positiveDone, negativeDone, positive, negative, parshaStats, topCompleted, letterStats } = stats;
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 space-y-5">
+      <div className="p-4 space-y-4">
+
+        {/* Hebrew date banner */}
+        <div className="rounded-lg bg-secondary/50 border border-border px-3 py-2 flex items-center justify-between">
+          <div>
+            <p className={`text-xs font-bold ${hdate.isShabbat ? "text-purple-600" : "text-primary"}`}>
+              {hdate.dayOfWeek}
+            </p>
+            <p className="text-sm font-semibold text-foreground">{hdate.formatted}</p>
+            <p className="text-xs text-muted-foreground">{hdate.gregorianFormatted}</p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 gap-1.5 text-xs"
+            onClick={handleShare}
+          >
+            {copied
+              ? <><Check className="w-3.5 h-3.5 text-green-600" /> Copied!</>
+              : navigator.share
+                ? <><Share2 className="w-3.5 h-3.5" /> Share</>
+                : <><Copy className="w-3.5 h-3.5" /> Copy Progress</>
+            }
+          </Button>
+        </div>
 
         {/* Big summary */}
         <div className="rounded-xl border border-border bg-card p-4 text-center">
@@ -84,10 +125,27 @@ export function ProgressChart() {
           <div className="mt-3 h-3 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-primary via-blue-400 to-green-400"
-              style={{ width: `${Math.max(pct, totalDone > 0 ? 1 : 0)}%` }}
+              style={{ width: `${Math.max(pct, totalDone > 0 ? 0.5 : 0)}%` }}
             />
           </div>
           <div className="text-xs text-muted-foreground mt-1">{pct.toFixed(1)}% of the 613</div>
+          {myName && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              Tracking as <span className="font-semibold text-primary">{myName}</span>
+              {" · "}
+              <button
+                className="underline underline-offset-2 hover:text-foreground transition-colors"
+                onClick={handleShare}
+              >
+                share with group
+              </button>
+            </div>
+          )}
+          {!myName && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              Go to <span className="font-medium text-primary">Group</span> tab to set your name and share with friends
+            </div>
+          )}
         </div>
 
         {/* Positive vs Negative */}
@@ -134,11 +192,7 @@ export function ProgressChart() {
                       className="h-full rounded-full transition-all"
                       style={{
                         width: `${(done / total) * 100}%`,
-                        background: done === total
-                          ? "#22c55e"
-                          : done > 0
-                            ? "hsl(var(--primary))"
-                            : "transparent",
+                        background: done === total ? "#22c55e" : done > 0 ? "hsl(var(--primary))" : "transparent",
                       }}
                     />
                   </div>
@@ -148,7 +202,7 @@ export function ProgressChart() {
           </div>
         )}
 
-        {/* Top letters done */}
+        {/* Top letters */}
         {letterStats.length > 0 && (
           <div className="rounded-lg border border-border bg-card p-3">
             <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-3">Most Completed (by letter)</h3>
@@ -164,7 +218,7 @@ export function ProgressChart() {
           </div>
         )}
 
-        {/* Recently completed */}
+        {/* Completed list */}
         {topCompleted.length > 0 && (
           <div className="rounded-lg border border-border bg-card p-3">
             <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Completed Mitzvot</h3>

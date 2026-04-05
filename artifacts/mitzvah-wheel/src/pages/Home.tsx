@@ -4,6 +4,8 @@ import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
 import { DailyChecklist } from "@/components/DailyChecklist";
 import { ProgressChart } from "@/components/ProgressChart";
+import { GroupTab } from "@/components/GroupTab";
+import { useHebrewDate } from "@/hooks/use-hebrew-date";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,11 +17,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2 } from "lucide-react";
+import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2, Users } from "lucide-react";
 
 const WHEEL_SLOT_COUNT = 48;
 
-type Tab = "wheel" | "daily" | "progress";
+type Tab = "wheel" | "daily" | "progress" | "group";
 
 function pickRandom(arr: string[], n: number): string[] {
   const shuffled = [...arr].sort(() => Math.random() - 0.5);
@@ -34,6 +36,7 @@ interface SelectedMitzvah {
 export default function Home() {
   const { mitzvahs, isLoaded, addMitzvah, removeMitzvah, resetToDefaults } = useMitzvahs();
   const { completed, toggleCompleted, clearCompleted } = useCompletedMitzvahs();
+  const hdate = useHebrewDate();
   const [tab, setTab] = useState<Tab>("wheel");
   const [spinning, setSpinning] = useState(false);
   const [selected, setSelected] = useState<SelectedMitzvah | null>(null);
@@ -105,38 +108,56 @@ export default function Home() {
       <Confetti active={showConfetti} />
 
       {/* Header */}
-      <header className="relative flex-shrink-0 py-3 px-6 bg-secondary shadow-md flex items-center justify-center gap-3">
-        <Star className="w-6 h-6 text-primary fill-primary flex-shrink-0" />
-        <div className="text-center">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-primary leading-tight">
-            Wheel of Mitzvot
-          </h1>
-          <p className="text-xs md:text-sm text-secondary-foreground/80 font-serif">
-            All 613 mitzvot — spin or choose from the list
+      <header className="relative flex-shrink-0 py-2 px-6 bg-secondary shadow-md flex items-center justify-between gap-3">
+        {/* Hebrew date — left */}
+        <div className="flex-1 hidden sm:block">
+          <p className={`text-xs font-bold ${hdate.isShabbat ? "text-purple-400" : "text-primary/70"}`}>
+            {hdate.dayOfWeek}
           </p>
+          <p className="text-xs text-secondary-foreground/80 font-serif">{hdate.formatted}</p>
         </div>
-        <Star className="w-6 h-6 text-primary fill-primary flex-shrink-0" />
-        {completedCount > 0 && (
-          <button
-            onClick={clearCompleted}
-            className="absolute right-4 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            title="Clear all completions"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-            {completedCount} done
-            <XCircle className="w-3 h-3 ml-0.5 opacity-50" />
-          </button>
-        )}
+
+        {/* Center title */}
+        <div className="text-center flex items-center gap-2">
+          <Star className="w-5 h-5 text-primary fill-primary flex-shrink-0" />
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary leading-tight">
+              Wheel of Mitzvot
+            </h1>
+            <p className="text-[10px] md:text-xs text-secondary-foreground/70 font-serif">
+              All 613 mitzvot — spin or choose from the list
+            </p>
+          </div>
+          <Star className="w-5 h-5 text-primary fill-primary flex-shrink-0" />
+        </div>
+
+        {/* Completed count — right */}
+        <div className="flex-1 flex justify-end">
+          {completedCount > 0 && (
+            <button
+              onClick={clearCompleted}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              title="Clear all completions"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+              {completedCount} done
+              <XCircle className="w-3 h-3 ml-0.5 opacity-50" />
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Tab bar */}
       <div className="flex-shrink-0 flex border-b border-border bg-muted/30">
-        {(["wheel", "daily", "progress"] as Tab[]).map((t) => {
-          const labels: Record<Tab, string> = { wheel: "Wheel", daily: "Daily Checklist", progress: "My Progress" };
+        {(["wheel", "daily", "progress", "group"] as Tab[]).map((t) => {
+          const labels: Record<Tab, string> = {
+            wheel: "Wheel", daily: "Daily", progress: "Progress", group: "Group",
+          };
           const icons: Record<Tab, React.ReactNode> = {
             wheel: <Shuffle className="w-3.5 h-3.5" />,
             daily: <ListChecks className="w-3.5 h-3.5" />,
             progress: <BarChart2 className="w-3.5 h-3.5" />,
+            group: <Users className="w-3.5 h-3.5" />,
           };
           return (
             <button
@@ -165,6 +186,12 @@ export default function Home() {
       {tab === "progress" && (
         <div className="flex-1 min-h-0 overflow-hidden">
           <ProgressChart />
+        </div>
+      )}
+
+      {tab === "group" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <GroupTab />
         </div>
       )}
 
