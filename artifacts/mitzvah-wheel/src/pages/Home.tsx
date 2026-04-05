@@ -1,12 +1,12 @@
 import { useState, useCallback } from "react";
-import { useMitzvahs } from "@/hooks/use-mitzvahs";
+import { useMitzvahs, MITZVAH_EXAMPLES } from "@/hooks/use-mitzvahs";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2, Plus, RotateCcw, Star } from "lucide-react";
+import { Trash2, Plus, RotateCcw, Star, Shuffle, Hand } from "lucide-react";
 
 const WHEEL_SLOT_COUNT = 12;
 
@@ -15,28 +15,49 @@ function pickRandom(arr: string[], n: number): string[] {
   return shuffled.slice(0, Math.min(n, arr.length));
 }
 
+interface SelectedMitzvah {
+  name: string;
+  example: string | null;
+}
+
 export default function Home() {
   const { mitzvahs, isLoaded, addMitzvah, removeMitzvah, resetToDefaults } = useMitzvahs();
   const [spinning, setSpinning] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const [selected, setSelected] = useState<SelectedMitzvah | null>(null);
   const [newMitzvah, setNewMitzvah] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
   const [wheelItems, setWheelItems] = useState<string[] | null>(null);
 
+  const selectMitzvah = (name: string, withConfetti = false) => {
+    setSelected({
+      name,
+      example: MITZVAH_EXAMPLES[name] ?? null,
+    });
+    if (withConfetti) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 4000);
+    }
+  };
+
   const handleSpin = () => {
     if (spinning || mitzvahs.length === 0) return;
-    setResult(null);
+    setSelected(null);
     setShowConfetti(false);
-    const selected = pickRandom(mitzvahs, WHEEL_SLOT_COUNT);
-    setWheelItems(selected);
+    const selection = pickRandom(mitzvahs, WHEEL_SLOT_COUNT);
+    setWheelItems(selection);
     setSpinning(true);
   };
 
   const handleSpinComplete = useCallback((winner: string) => {
-    setResult(winner);
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 4000);
+    selectMitzvah(winner, true);
   }, []);
+
+  const handleChoose = (name: string) => {
+    if (spinning) return;
+    setSelected(null);
+    setShowConfetti(false);
+    setTimeout(() => selectMitzvah(name, true), 80);
+  };
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +76,7 @@ export default function Home() {
       <Confetti active={showConfetti} />
 
       {/* Header */}
-      <header className="w-full py-8 text-center bg-secondary text-secondary-foreground shadow-md relative overflow-hidden">
+      <header className="w-full py-8 text-center bg-secondary text-secondary-foreground shadow-md">
         <div className="relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-primary flex items-center justify-center gap-4">
             <Star className="w-8 h-8 md:w-10 md:h-10 fill-primary" />
@@ -63,15 +84,15 @@ export default function Home() {
             <Star className="w-8 h-8 md:w-10 md:h-10 fill-primary" />
           </h1>
           <p className="mt-3 text-lg md:text-xl font-medium max-w-2xl mx-auto px-4 opacity-90 font-serif">
-            Spin the wheel, discover a good deed, and bring light to the world.
+            Spin the wheel, choose your mitzvah, and bring light to the world.
           </p>
         </div>
       </header>
 
       <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
 
-        {/* Left Column: The Wheel */}
-        <div className="lg:col-span-7 flex flex-col items-center justify-start space-y-8">
+        {/* Left Column: Wheel + Result */}
+        <div className="lg:col-span-7 flex flex-col items-center justify-start space-y-6">
 
           <div className="bg-white/50 p-6 md:p-8 rounded-[2rem] shadow-xl border border-primary/20 w-full max-w-[500px] backdrop-blur-sm">
             <Wheel
@@ -89,53 +110,71 @@ export default function Home() {
             disabled={spinning || mitzvahs.length === 0}
             data-testid="spin-button"
           >
+            <Shuffle className="w-6 h-6 mr-2" />
             SPIN THE WHEEL
           </Button>
 
-          {/* Result Display */}
+          <p className="text-sm text-muted-foreground text-center max-w-[400px]">
+            Each spin randomly selects {WHEEL_SLOT_COUNT} from your {mitzvahs.length} mitzvot.
+            Or choose one directly from the list.
+          </p>
+
+          {/* Result / Example Card */}
           <div
             className={`w-full max-w-[500px] transition-all duration-700 transform ${
-              result ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+              selected ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
             }`}
           >
             <Card className="border-2 border-primary shadow-lg bg-card overflow-hidden">
               <div className="bg-primary/10 py-2 text-center border-b border-primary/20">
                 <span className="text-sm font-bold text-primary tracking-widest uppercase">Your Mitzvah</span>
               </div>
-              <CardContent className="pt-8 pb-10 text-center relative">
-                <div className="absolute top-4 left-4 text-4xl text-primary/20 font-serif">"</div>
-                <div className="absolute bottom-4 right-4 text-4xl text-primary/20 font-serif">"</div>
+              <CardContent className="pt-6 pb-8 text-center relative">
+                <div className="absolute top-4 left-4 text-4xl text-primary/20 font-serif leading-none">"</div>
+                <div className="absolute bottom-4 right-4 text-4xl text-primary/20 font-serif leading-none">"</div>
+
                 <h2
-                  className="text-3xl md:text-4xl font-bold text-foreground leading-tight px-6"
+                  className="text-2xl md:text-3xl font-bold text-foreground leading-tight px-6 mb-4"
                   data-testid="result-display"
                 >
-                  {result}
+                  {selected?.name}
                 </h2>
+
+                {selected?.example && (
+                  <div className="mt-4 mx-2 px-4 py-4 bg-primary/5 border border-primary/15 rounded-xl text-left">
+                    <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">How to do it today</p>
+                    <p className="text-sm md:text-base text-foreground leading-relaxed font-serif italic">
+                      {selected.example}
+                    </p>
+                  </div>
+                )}
+
+                {selected && !selected.example && (
+                  <p className="text-sm text-muted-foreground mt-4 italic px-6">
+                    You added this mitzvah. Find a meaningful way to make it part of your day.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
-
-          <p className="text-sm text-muted-foreground text-center max-w-[400px]">
-            Each spin randomly selects {WHEEL_SLOT_COUNT} mitzvot from your full list of {mitzvahs.length}. Every spin is a new opportunity.
-          </p>
         </div>
 
         {/* Right Column: Full Mitzvah List */}
         <div className="lg:col-span-5">
-          <Card className="shadow-lg border-muted h-full flex flex-col" style={{ maxHeight: '800px' }}>
-            <CardHeader className="bg-muted/50 border-b border-border pb-6">
+          <Card className="shadow-lg border-muted h-full flex flex-col" style={{ maxHeight: '820px' }}>
+            <CardHeader className="bg-muted/50 border-b border-border pb-5">
               <CardTitle className="text-2xl font-serif text-secondary">Mitzvah List</CardTitle>
               <CardDescription className="text-base">
-                {mitzvahs.length} mitzvot in your wheel pool. Add your own below.
+                {mitzvahs.length} mitzvot in your pool — click any to select it, or spin for a surprise.
               </CardDescription>
             </CardHeader>
 
             <CardContent className="p-0 flex-1 flex flex-col min-h-0">
               {/* Add new */}
-              <div className="p-6 border-b border-border bg-white">
+              <div className="p-5 border-b border-border bg-white">
                 <form onSubmit={handleAdd} className="flex gap-2">
                   <Input
-                    placeholder="Add a mitzvah..."
+                    placeholder="Add your own mitzvah..."
                     value={newMitzvah}
                     onChange={(e) => setNewMitzvah(e.target.value)}
                     className="flex-1 text-base h-11"
@@ -143,41 +182,59 @@ export default function Home() {
                   />
                   <Button
                     type="submit"
-                    className="h-11 px-6 font-semibold"
+                    className="h-11 px-5 font-semibold"
                     disabled={!newMitzvah.trim() || spinning}
                     data-testid="add-mitzvah-button"
                   >
-                    <Plus className="w-5 h-5 mr-1" /> Add
+                    <Plus className="w-4 h-4 mr-1" /> Add
                   </Button>
                 </form>
               </div>
 
               {/* Scrollable list */}
-              <ScrollArea className="flex-1 p-4" data-testid="mitzvah-list">
-                <div className="space-y-2">
+              <ScrollArea className="flex-1 px-3 py-2" data-testid="mitzvah-list">
+                <div className="space-y-1 py-1">
                   {mitzvahs.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground italic">
                       No mitzvot in the list. Add one or reset to defaults.
                     </div>
                   ) : (
-                    mitzvahs.map((m, i) => (
-                      <div
-                        key={`${i}-${m}`}
-                        className="group flex items-center justify-between py-2 px-3 rounded-lg border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-colors"
-                      >
-                        <span className="text-sm font-medium text-foreground pr-2 leading-snug">{m}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeMitzvah(i)}
-                          disabled={spinning}
-                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                          title="Remove mitzvah"
+                    mitzvahs.map((m, i) => {
+                      const isActive = selected?.name === m;
+                      return (
+                        <div
+                          key={`${i}-${m}`}
+                          className={`group flex items-center justify-between py-2.5 px-3 rounded-xl border transition-all cursor-pointer ${
+                            isActive
+                              ? 'border-primary bg-primary/10 shadow-sm'
+                              : 'border-transparent hover:border-primary/25 hover:bg-primary/5'
+                          }`}
+                          onClick={() => handleChoose(m)}
+                          data-testid={`mitzvah-item-${i}`}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    ))
+                          <div className="flex items-center gap-2 min-w-0">
+                            {isActive ? (
+                              <Star className="w-3.5 h-3.5 text-primary fill-primary flex-shrink-0" />
+                            ) : (
+                              <Hand className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            )}
+                            <span className={`text-sm font-medium leading-snug truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+                              {m}
+                            </span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => { e.stopPropagation(); removeMitzvah(i); }}
+                            disabled={spinning}
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-1"
+                            title="Remove mitzvah"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </ScrollArea>
