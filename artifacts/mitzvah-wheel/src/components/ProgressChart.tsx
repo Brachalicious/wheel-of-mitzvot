@@ -7,11 +7,22 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, TrendingUp, Award, Share2, Copy, Check, Users } from "lucide-react";
 
 const PARSHA_ORDER = [
-  "Noach", "Lech Lecha", "Vayishlach",
-  "Bo", "Yitro", "Mishpatim", "Vayakhel",
-  "Vayikra", "Acharei Mot", "Kedoshim", "Emor", "Behar",
-  "Shelach", "Pinchas",
-  "Vaetchanan", "Eikev", "Re'eh", "Shoftim", "Ki Tetzei", "Vayelech",
+  // Bereishit (Genesis)
+  "Bereishit", "Noach", "Lech Lecha", "Vayeira", "Chayei Sara",
+  "Toldot", "Vayetzei", "Vayishlach", "Vayeshev", "Miketz", "Vayigash", "Vayechi",
+  // Shemot (Exodus)
+  "Shemot", "Vaera", "Bo", "Beshalach", "Yitro", "Mishpatim",
+  "Terumah", "Tetzaveh", "Ki Tisa", "Vayakhel", "Pekudei",
+  // Vayikra (Leviticus)
+  "Vayikra", "Tzav", "Shemini", "Tazria", "Metzora",
+  "Acharei Mot", "Kedoshim", "Emor", "Behar", "Bechukotai",
+  // Bamidbar (Numbers)
+  "Bamidbar", "Nasso", "Beha'alotcha", "Shelach", "Korach",
+  "Chukat", "Balak", "Pinchas", "Matot", "Masei",
+  // Devarim (Deuteronomy)
+  "Devarim", "Vaetchanan", "Eikev", "Re'eh", "Shoftim",
+  "Ki Tetzei", "Ki Tavo", "Nitzavim", "Vayelech", "Ha'azinu", "Ve'zot HaBrachah",
+  // Psalms
   "Tehillim / Hallel",
 ];
 

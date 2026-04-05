@@ -786,13 +786,66 @@ export const MITZVAH_SOURCES: Record<string, MitzvahSource> = {
   "Do not wrong the widow and orphan": { parsha: "Mishpatim", book: "Exodus", chapter: 22, verse: 21 },
   "Do not accept bribes": { parsha: "Mishpatim", book: "Exodus", chapter: 23, verse: 8 },
 
+  // Exodus — Terumah
+  "Build the Holy Temple": { parsha: "Terumah", book: "Exodus", chapter: 25, verse: 8 },
+  "Separate terumah (portion for the Kohen)": { parsha: "Terumah", book: "Exodus", chapter: 25, verse: 2 },
+  "Revere the Holy Temple": { parsha: "Terumah", book: "Exodus", chapter: 25, verse: 8 },
+  "Guard the Temple": { parsha: "Terumah", book: "Exodus", chapter: 25, verse: 8 },
+
+  // Exodus — Tetzaveh
+  "Light the Menorah in the Temple daily": { parsha: "Tetzaveh", book: "Exodus", chapter: 27, verse: 20 },
+  "The Kohen Gadol shall wear his special garments in service": { parsha: "Tetzaveh", book: "Exodus", chapter: 28, verse: 4 },
+  "The Kohen shall wear his special garments during service": { parsha: "Tetzaveh", book: "Exodus", chapter: 28, verse: 40 },
+  "Burn incense on the golden altar twice daily": { parsha: "Tetzaveh", book: "Exodus", chapter: 30, verse: 7 },
+
+  // Exodus — Ki Tisa
+  "The Kohen shall wash hands and feet before service": { parsha: "Ki Tisa", book: "Exodus", chapter: 30, verse: 19 },
+  "Consecrate the Kohen Gadol by anointing with oil": { parsha: "Ki Tisa", book: "Exodus", chapter: 30, verse: 30 },
+  "Do not replicate the anointing oil": { parsha: "Ki Tisa", book: "Exodus", chapter: 30, verse: 32 },
+  "Do not use the anointing oil for non-sacred purposes": { parsha: "Ki Tisa", book: "Exodus", chapter: 30, verse: 32 },
+  "Do not replicate the Temple incense compound": { parsha: "Ki Tisa", book: "Exodus", chapter: 30, verse: 37 },
+  "Do not use the sacred incense for personal pleasure": { parsha: "Ki Tisa", book: "Exodus", chapter: 30, verse: 37 },
+
   // Exodus — Vayakhel
   "Kindle Shabbat lights before sunset Friday": { parsha: "Vayakhel", book: "Exodus", chapter: 35, verse: 3 },
 
   // Leviticus — Vayikra
   "Do not swear unnecessarily": { parsha: "Vayikra", book: "Leviticus", chapter: 5, verse: 4 },
 
+  // Leviticus — Tzav
+  "Keep the altar fire burning perpetually": { parsha: "Tzav", book: "Leviticus", chapter: 6, verse: 6 },
+  "Remove the ashes from the altar daily": { parsha: "Tzav", book: "Leviticus", chapter: 6, verse: 3 },
+  "The Kohen Gadol shall bring a daily meal offering": { parsha: "Tzav", book: "Leviticus", chapter: 6, verse: 13 },
+  "Sanctify the Kohen through anointing": { parsha: "Tzav", book: "Leviticus", chapter: 8, verse: 12 },
+  "Bring a peace offering (shelamim)": { parsha: "Tzav", book: "Leviticus", chapter: 7, verse: 11 },
+
+  // Leviticus — Shemini
+  "Examine the signs of a kosher animal": { parsha: "Shemini", book: "Leviticus", chapter: 11, verse: 2 },
+  "Examine the signs of a kosher fish": { parsha: "Shemini", book: "Leviticus", chapter: 11, verse: 9 },
+  "Examine the signs of a kosher bird": { parsha: "Shemini", book: "Leviticus", chapter: 11, verse: 13 },
+  "Examine the signs of a kosher locust": { parsha: "Shemini", book: "Leviticus", chapter: 11, verse: 21 },
+  "The Kohanim shall serve in the Temple": { parsha: "Shemini", book: "Leviticus", chapter: 9, verse: 7 },
+
+  // Leviticus — Tazria
+  "Observe the laws of a woman after childbirth": { parsha: "Tazria", book: "Leviticus", chapter: 12, verse: 2 },
+  "Observe the laws of tzaraat (leprosy)": { parsha: "Tazria", book: "Leviticus", chapter: 13, verse: 2 },
+  "The Kohen shall examine tzaraat": { parsha: "Tazria", book: "Leviticus", chapter: 13, verse: 3 },
+  "Observe the laws of tzaraat on garments": { parsha: "Tazria", book: "Leviticus", chapter: 13, verse: 47 },
+  "Observe the laws of tzaraat on the skin": { parsha: "Tazria", book: "Leviticus", chapter: 13, verse: 2 },
+  "The metzora shall observe the isolation procedures": { parsha: "Tazria", book: "Leviticus", chapter: 13, verse: 46 },
+
+  // Leviticus — Metzora
+  "The metzora shall shave during purification": { parsha: "Metzora", book: "Leviticus", chapter: 14, verse: 9 },
+  "The Kohen shall declare the metzora pure": { parsha: "Metzora", book: "Leviticus", chapter: 14, verse: 11 },
+  "The metzora shall bring offerings after purification": { parsha: "Metzora", book: "Leviticus", chapter: 14, verse: 12 },
+  "Observe the laws of house tzaraat": { parsha: "Metzora", book: "Leviticus", chapter: 14, verse: 34 },
+  "The Kohen shall examine house tzaraat": { parsha: "Metzora", book: "Leviticus", chapter: 14, verse: 38 },
+  "The metzora shall undergo complete bodily shaving": { parsha: "Metzora", book: "Leviticus", chapter: 14, verse: 9 },
+  "Observe the laws of a male with a discharge (zav)": { parsha: "Metzora", book: "Leviticus", chapter: 15, verse: 2 },
+  "Observe the laws of zav impurity and purification": { parsha: "Metzora", book: "Leviticus", chapter: 15, verse: 13 },
+
   // Leviticus — Acharei Mot
+  "The Kohen Gadol shall perform the Yom Kippur service": { parsha: "Acharei Mot", book: "Leviticus", chapter: 16, verse: 2 },
   "Do not eat blood": { parsha: "Acharei Mot", book: "Leviticus", chapter: 17, verse: 14 },
 
   // Leviticus — Kedoshim
@@ -837,12 +890,63 @@ export const MITZVAH_SOURCES: Record<string, MitzvahSource> = {
   // Leviticus — Behar
   "Observe the sabbatical year (sh'mittah)": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 4 },
   "Do not charge interest to a Jew": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 37 },
+  "Observe the jubilee year (yovel)": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 10 },
+  "Return land to its original owner in yovel": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 28 },
+  "Return the Hebrew slave to freedom in yovel": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 41 },
+  "Rest the land during the sh'mittah year": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 4 },
+  "Leave sh'mittah produce for all to eat": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 6 },
+
+  // Leviticus — Bechukotai
+  "Tithe cattle and sheep each year": { parsha: "Bechukotai", book: "Leviticus", chapter: 27, verse: 32 },
+  "Observe the laws of redemption of consecrated items": { parsha: "Bechukotai", book: "Leviticus", chapter: 27, verse: 15 },
+  "Observe the laws of the dedicated (cherem) field": { parsha: "Bechukotai", book: "Leviticus", chapter: 27, verse: 21 },
+  "Observe the laws of a sanctified animal (kodshim)": { parsha: "Bechukotai", book: "Leviticus", chapter: 27, verse: 9 },
+  "Observe the laws of a substituted animal": { parsha: "Bechukotai", book: "Leviticus", chapter: 27, verse: 10 },
+
+  // Numbers — Bamidbar
+  "Observe the counting of the Levites": { parsha: "Bamidbar", book: "Numbers", chapter: 1, verse: 49 },
+  "The Levites shall carry the Ark on their shoulders": { parsha: "Bamidbar", book: "Numbers", chapter: 4, verse: 15 },
+  "The Levites shall serve in the Temple": { parsha: "Bamidbar", book: "Numbers", chapter: 1, verse: 50 },
+
+  // Numbers — Nasso
+  "The Kohanim shall bless the people (duchening)": { parsha: "Nasso", book: "Numbers", chapter: 6, verse: 23 },
+  "Observe all laws of the nazirite vow": { parsha: "Nasso", book: "Numbers", chapter: 6, verse: 2 },
+  "A nazirite shall shave his head when his term ends": { parsha: "Nasso", book: "Numbers", chapter: 6, verse: 18 },
+  "The Kohen Gadol and nazirite shall not become impure": { parsha: "Nasso", book: "Numbers", chapter: 6, verse: 6 },
+  "Observe the laws of the suspected adulteress (sotah)": { parsha: "Nasso", book: "Numbers", chapter: 5, verse: 12 },
+  "The court shall follow the sotah procedure": { parsha: "Nasso", book: "Numbers", chapter: 5, verse: 15 },
+
+  // Numbers — Beha'alotcha
+  "Bring the second Passover offering if you missed the first": { parsha: "Beha'alotcha", book: "Numbers", chapter: 9, verse: 11 },
 
   // Numbers — Shelach
   "Wear tzitzit": { parsha: "Shelach", book: "Numbers", chapter: 15, verse: 38 },
 
+  // Numbers — Korach
+  "Levites shall not perform the Kohanim's service": { parsha: "Korach", book: "Numbers", chapter: 18, verse: 3 },
+  "Separate the first tithe for the Levite": { parsha: "Korach", book: "Numbers", chapter: 18, verse: 24 },
+  "The Levite shall separate a tithe from his tithe": { parsha: "Korach", book: "Numbers", chapter: 18, verse: 28 },
+
+  // Numbers — Chukat
+  "Observe the red heifer (parah adumah) purification process": { parsha: "Chukat", book: "Numbers", chapter: 19, verse: 2 },
+  "Purify those with corpse impurity through the red heifer": { parsha: "Chukat", book: "Numbers", chapter: 19, verse: 9 },
+  "Burn the red heifer outside the city limits": { parsha: "Chukat", book: "Numbers", chapter: 19, verse: 3 },
+  "Observe the laws of corpse impurity": { parsha: "Chukat", book: "Numbers", chapter: 19, verse: 14 },
+
   // Numbers — Pinchas
   "Blow the shofar on Rosh Hashanah": { parsha: "Pinchas", book: "Numbers", chapter: 29, verse: 1 },
+
+  // Numbers — Matot
+  "Keep your oaths and vows": { parsha: "Matot", book: "Numbers", chapter: 30, verse: 3 },
+  "Observe the laws of vows (nedarim)": { parsha: "Matot", book: "Numbers", chapter: 30, verse: 2 },
+  "The husband may annul his wife's vows": { parsha: "Matot", book: "Numbers", chapter: 30, verse: 9 },
+  "Observe the laws of oaths": { parsha: "Matot", book: "Numbers", chapter: 30, verse: 3 },
+
+  // Numbers — Masei
+  "Establish six cities of refuge": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 11 },
+  "The court shall exile an accidental killer to a city of refuge": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 25 },
+  "Give the Levites cities to dwell in": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 2 },
+  "Exile an accidental killer to a city of refuge": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 12 },
 
   // Deuteronomy — Vaetchanan
   "Accept God's complete unity": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 4 },
@@ -877,8 +981,14 @@ export const MITZVAH_SOURCES: Record<string, MitzvahSource> = {
   "Bury the dead": { parsha: "Ki Tetzei", book: "Deuteronomy", chapter: 21, verse: 23 },
   "Do not delay fulfilling a vow to God": { parsha: "Ki Tetzei", book: "Deuteronomy", chapter: 23, verse: 22 },
 
+  // Deuteronomy — Ki Tavo
+  "Bring the first fruits (bikkurim) to the Temple": { parsha: "Ki Tavo", book: "Deuteronomy", chapter: 26, verse: 2 },
+  "Recite the declaration when bringing first fruits": { parsha: "Ki Tavo", book: "Deuteronomy", chapter: 26, verse: 3 },
+  "Recite the tithe declaration and confession": { parsha: "Ki Tavo", book: "Deuteronomy", chapter: 26, verse: 13 },
+
   // Deuteronomy — Vayelech
   "Every person shall write a Torah scroll": { parsha: "Vayelech", book: "Deuteronomy", chapter: 31, verse: 19 },
+  "Read the Torah publicly in the Hakhel gathering": { parsha: "Vayelech", book: "Deuteronomy", chapter: 31, verse: 12 },
 
   // Psalms (Hallel)
   "Recite Hallel on designated festival days": { parsha: "Tehillim / Hallel", book: "Psalms", chapter: 113, verse: 1 },
