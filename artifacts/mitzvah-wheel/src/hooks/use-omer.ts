@@ -1,6 +1,7 @@
 // Sefirat HaOmer — full data for all 49 days
 // Includes: Hebrew bracha, Hebrew count formula, transliteration, sefirot, growth practice
 import { HDate } from "@hebcal/core";
+import { OMER_PRACTICES } from "./use-omer-practices";
 
 // ── Sefirah types ─────────────────────────────────────────────────────────────
 
@@ -22,10 +23,11 @@ export interface OmerDay {
   hebrewCount: string;            // Hebrew text of count formula
   transliteration: string;        // the phonetic Omer formula
   englishCount: string;           // English summary
-  growth: string;                 // How to work on the sefirah today
+  practices: string[];            // Concrete, selectable daily practice scenarios
   quote: string;                  // Inspirational quote from Jewish tradition
   quoteSource: string;            // Source of the quote
   isLagBaOmer: boolean;
+  growth?: string;                // Legacy description (kept for data backwards-compat)
 }
 
 export interface OmerInfo extends OmerDay {
@@ -62,7 +64,7 @@ const SEFIRAH_META: Record<Sefirah, {
 
 // ── Raw 49-day data ───────────────────────────────────────────────────────────
 
-const DAYS_RAW: Omit<OmerDay, "day" | "isLagBaOmer">[] = [
+const DAYS_RAW: Omit<OmerDay, "day" | "isLagBaOmer" | "practices" | "quote" | "quoteSource">[] = [
   // ── WEEK 1: Chesed ──────────────────────────────────────────────────────────
   {
     weekSefirah: "Chesed", daySefirah: "Chesed",
@@ -542,6 +544,7 @@ export const OMER_DAYS: OmerDay[] = DAYS_RAW.map((d, i) => ({
   ...d,
   day: i + 1,
   isLagBaOmer: i + 1 === 33,
+  practices: OMER_PRACTICES[i + 1] ?? [],
   quote: OMER_QUOTES[i].quote,
   quoteSource: OMER_QUOTES[i].quoteSource,
 }));
