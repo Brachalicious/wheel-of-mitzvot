@@ -6,6 +6,7 @@ import { Confetti } from "@/components/Confetti";
 import { DailyChecklist } from "@/components/DailyChecklist";
 import { OmerCounter } from "@/components/OmerCounter";
 import { SoulLevels } from "@/components/SoulLevels";
+import { Reminders } from "@/components/Reminders";
 import { ProgressChart } from "@/components/ProgressChart";
 import { GroupTab } from "@/components/GroupTab";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
@@ -184,6 +185,7 @@ export default function Home() {
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="flex flex-col gap-4 p-4">
             <OmerCounter />
+            <Reminders />
             <SoulLevels />
             <DailyChecklist />
           </div>
@@ -206,17 +208,17 @@ export default function Home() {
         <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-0">
 
           {/* ── LEFT: Wheel + Spin Button ── */}
-          <div className="flex flex-col items-center justify-center p-4 gap-3 min-h-0 border-r border-border overflow-hidden">
-            <div
-              className="w-full flex-shrink-0"
-              style={{ maxWidth: 'min(100%, calc(100vh - 230px))', maxHeight: 'calc(100vh - 230px)' }}
-            >
-              <Wheel
-                items={displayItems}
-                spinning={spinning}
-                setSpinning={setSpinning}
-                onSpinComplete={handleSpinComplete}
-              />
+          <div className="flex flex-col items-center justify-center p-4 gap-4 min-h-0 border-r border-border">
+            {/* Wheel — shrinks to fit available height, never exceeds container */}
+            <div className="w-full flex-1 min-h-0 flex items-center justify-center overflow-visible pt-6">
+              <div className="w-full" style={{ maxWidth: 'min(100%, 560px)' }}>
+                <Wheel
+                  items={displayItems}
+                  spinning={spinning}
+                  setSpinning={setSpinning}
+                  onSpinComplete={handleSpinComplete}
+                />
+              </div>
             </div>
 
             <Button
