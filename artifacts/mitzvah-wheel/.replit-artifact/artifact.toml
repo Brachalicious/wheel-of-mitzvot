@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Mitzvah Wheel"
+version = "1.0.0"
+id = "artifacts/mitzvah-wheel"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23347
+
+[services.development]
+run = "pnpm --filter @workspace/mitzvah-wheel run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mitzvah-wheel", "run", "build" ]
+publicDir = "artifacts/mitzvah-wheel/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23347"
+BASE_PATH = "/"
