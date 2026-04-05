@@ -141,6 +141,20 @@ export function OmerCounter() {
           </div>
         </div>
 
+        {/* Inspirational quote */}
+        <div className="mt-3 rounded-lg bg-white/75 border border-white/50 px-4 py-3 relative overflow-hidden">
+          <div
+            className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
+            style={{ backgroundColor: omer.color }}
+          />
+          <p className="text-sm font-serif italic text-foreground leading-relaxed pl-2">
+            "{omer.quote}"
+          </p>
+          <p className={`text-[10px] font-bold uppercase tracking-wider mt-1.5 pl-2 ${omer.textClass}`}>
+            — {omer.quoteSource}
+          </p>
+        </div>
+
         {/* Bracha — collapsible */}
         <div className="mt-3">
           <button

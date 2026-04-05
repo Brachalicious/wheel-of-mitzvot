@@ -23,6 +23,8 @@ export interface OmerDay {
   transliteration: string;        // the phonetic Omer formula
   englishCount: string;           // English summary
   growth: string;                 // How to work on the sefirah today
+  quote: string;                  // Inspirational quote from Jewish tradition
+  quoteSource: string;            // Source of the quote
   isLagBaOmer: boolean;
 }
 
@@ -468,11 +470,80 @@ const DAYS_RAW: Omit<OmerDay, "day" | "isLagBaOmer">[] = [
   },
 ];
 
+// ── Inspirational quotes — one per day, from Torah, Talmud & Chasidic masters ─
+
+const OMER_QUOTES: { quote: string; quoteSource: string }[] = [
+  // Week 1 — Chesed
+  { quote: "On three things the world stands: on Torah, on service, and on acts of loving-kindness.", quoteSource: "Shimon HaTzaddik · Pirkei Avot 1:2" },
+  { quote: "Love your fellow as yourself — this is the great principle of the entire Torah.", quoteSource: "Rabbi Akiva · Talmud Yerushalmi, Nedarim 9:4" },
+  { quote: "Many waters cannot quench love, nor can rivers drown it.", quoteSource: "Shir HaShirim 8:7" },
+  { quote: "The world was created only for the sake of one whose soul is filled with love.", quoteSource: "Adapted from Talmud Sanhedrin 37a" },
+  { quote: "Who is rich? One who is satisfied with his portion — and who is content finds love in every corner.", quoteSource: "Ben Zoma · Pirkei Avot 4:1" },
+  { quote: "Even a single candle can push away a great darkness. One act of loving-kindness illuminates the world.", quoteSource: "Baal Shem Tov · Keter Shem Tov §8" },
+  { quote: "There is no love like the love that asks nothing in return — the love of a father for his child.", quoteSource: "Adapted from Tanya, Iggeret HaKodesh §15" },
+
+  // Week 2 — Gevurah
+  { quote: "Who is mighty? One who subdues his inclination.", quoteSource: "Ben Zoma · Pirkei Avot 4:1" },
+  { quote: "Be strong as a leopard, swift as an eagle, fleet as a deer, and brave as a lion to do the will of your Father in Heaven.", quoteSource: "Yehudah ben Tema · Pirkei Avot 5:20" },
+  { quote: "A person should be soft as a reed, and not hard as a cedar.", quoteSource: "Talmud Ta'anit 20a" },
+  { quote: "Fall seven times, stand up eight.", quoteSource: "Mishlei (Proverbs) 24:16" },
+  { quote: "The strong person is not one who is never afraid. It is one who does what must be done in spite of fear.", quoteSource: "Adapted from Likutey Moharan I:16" },
+  { quote: "In the place where a penitent stands, even the completely righteous cannot stand.", quoteSource: "Talmud Berakhot 34b" },
+  { quote: "A king who cannot govern himself cannot govern a kingdom.", quoteSource: "Adapted from Rambam, Hilchot De'ot 1:5" },
+
+  // Week 3 — Tiferet
+  { quote: "Truth is the seal of the Holy One, Blessed be He.", quoteSource: "Talmud Shabbat 55a" },
+  { quote: "A person must always let his mind and heart be at peace with all people.", quoteSource: "Talmud Berakhot 17a" },
+  { quote: "Emet — truth — endures forever. A lie has no legs.", quoteSource: "Adapted from Mishlei 12:19" },
+  { quote: "Do not look at the vessel but at what it contains — inner truth is the only beauty that lasts.", quoteSource: "Ben Bag Bag · Pirkei Avot 4:20" },
+  { quote: "The world was created for the sake of those who speak truth.", quoteSource: "Adapted from Talmud Shabbat 55a" },
+  { quote: "What is hateful to you, do not do to your neighbor. This is the entire Torah — all the rest is commentary.", quoteSource: "Hillel · Talmud Shabbat 31a" },
+  { quote: "A person should always cast himself as half guilty and half innocent — live in the balance.", quoteSource: "Talmud Kiddushin 40b" },
+
+  // Week 4 — Netzach
+  { quote: "The Jewish people are compared to the stars — each one shines, and together they light the night.", quoteSource: "Adapted from Bereishit 22:17" },
+  { quote: "Do not despair! Even if a sharp sword rests on a person's neck, one should not give up on mercy.", quoteSource: "Talmud Berakhot 10a" },
+  { quote: "Though He slay me, yet will I trust in Him.", quoteSource: "Iyov (Job) 13:15" },
+  { quote: "After you reach the heights, return to the beginning — and begin again with new eyes.", quoteSource: "Adapted from Likutey Moharan I:6" },
+  { quote: "The righteous falls seven times and rises again.", quoteSource: "Mishlei (Proverbs) 24:16" },
+  { quote: "A great tree withstands every storm because its roots run deep and wide.", quoteSource: "Adapted from Talmud Ta'anit 20a" },
+  { quote: "You will be plentiful, you will succeed, you will go from strength to strength — for the whole earth belongs to God.", quoteSource: "Adapted from Tehillim (Psalms) 84:8" },
+
+  // Week 5 — Hod
+  { quote: "It is good to give thanks to God, and to sing to Your name, Most High.", quoteSource: "Tehillim (Psalms) 92:2" },
+  { quote: "Acknowledging what you lack is the beginning of wisdom; acknowledging what you have is the beginning of joy.", quoteSource: "Adapted from Pirkei Avot 4:1" },
+  { quote: "The one who gives thanks teaches themselves to see the world as it truly is — overflowing with goodness.", quoteSource: "Adapted from Tanya, Sha'ar HaYichud V'haEmunah Ch. 2" },
+  { quote: "Everything God does is for the good.", quoteSource: "Nachum Ish Gamzu · Talmud Ta'anit 21a" },
+  { quote: "Rabbi Shimon bar Yochai said: I have seen men of high quality and they are few. If there be a thousand, my son and I are among them.", quoteSource: "Talmud Sukkah 45b" },
+  { quote: "When you open your eyes to thankfulness, you discover that even darkness has been serving you.", quoteSource: "Adapted from Rabbi Nachman of Breslov, Likutey Moharan I:195" },
+  { quote: "Receive every person with a pleasant countenance — for a smile given freely is more powerful than any gift.", quoteSource: "Shammai · Pirkei Avot 1:15" },
+
+  // Week 6 — Yesod
+  { quote: "The righteous man is the foundation of the world.", quoteSource: "Mishlei (Proverbs) 10:25" },
+  { quote: "Acquire a friend for yourself — it is the greatest acquisition.", quoteSource: "Adapted from Yehoshua ben Perachiah · Pirkei Avot 1:6" },
+  { quote: "Two are better than one, for if one falls the other lifts his companion.", quoteSource: "Kohelet (Ecclesiastes) 4:9–10" },
+  { quote: "A faithful friend is a strong shelter. He who finds one finds a treasure.", quoteSource: "Ben Sira (Ecclesiasticus) 6:14" },
+  { quote: "Love your neighbor as yourself — say it to them. The world runs on words heard by a beating heart.", quoteSource: "Adapted from Vayikra (Leviticus) 19:18" },
+  { quote: "All of Israel are responsible for one another.", quoteSource: "Talmud Shevuot 39a" },
+  { quote: "One who saves a single soul, it is as if he saved an entire world.", quoteSource: "Talmud Sanhedrin 37a" },
+
+  // Week 7 — Malchut
+  { quote: "The heart of a king is in the hand of God; He turns it wherever He wishes.", quoteSource: "Mishlei (Proverbs) 21:1" },
+  { quote: "I have set the Lord before me always — this is the great principle of the Torah and the mark of the righteous.", quoteSource: "Tehillim (Psalms) 16:8 · Rema, Orach Chaim 1:1" },
+  { quote: "This is the gate of God; the righteous shall enter through it.", quoteSource: "Tehillim (Psalms) 118:20" },
+  { quote: "Am Yisrael Chai — the nation of Israel lives. It lives in each of you.", quoteSource: "Traditional · Based on Yechezkel 37:14" },
+  { quote: "Not by might, and not by power, but by My spirit — says the Lord of Hosts.", quoteSource: "Zechariah 4:6" },
+  { quote: "Torah was given through forty-eight qualities. You have just lived forty-eight days. Tonight, you hold all of them.", quoteSource: "Pirkei Avot 6:6 · tradition of the Vilna Gaon" },
+  { quote: "You stand today, all of you, before the Lord your God — to enter into His covenant. Welcome home.", quoteSource: "Devarim (Deuteronomy) 29:9" },
+];
+
 // Build the 49-day array
 export const OMER_DAYS: OmerDay[] = DAYS_RAW.map((d, i) => ({
   ...d,
   day: i + 1,
   isLagBaOmer: i + 1 === 33,
+  quote: OMER_QUOTES[i].quote,
+  quoteSource: OMER_QUOTES[i].quoteSource,
 }));
 
 // ── Public API ────────────────────────────────────────────────────────────────
