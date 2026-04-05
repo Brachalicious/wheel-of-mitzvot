@@ -105,7 +105,7 @@ export default function Home() {
         <Star className="w-6 h-6 text-primary fill-primary flex-shrink-0" />
         <div className="text-center">
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-primary leading-tight">
-            Mitzvah Wheel
+            Wheel of Mitzvot
           </h1>
           <p className="text-xs md:text-sm text-secondary-foreground/80 font-serif">
             All 613 mitzvot — spin or choose from the list
