@@ -658,7 +658,7 @@ export const MITZVAH_EXAMPLES: Record<string, string> = {
   "Love your neighbor as yourself":
     "Before reacting to someone today, pause and ask: how would I want to be treated in their place? Let that answer guide your response.",
   "Love the convert":
-    "If you know someone who is converting or recently converted, reach out with warmth. They have chosen this path — honor that courage.",
+    "The Torah commands this mitzvah 36 times — more than any other. Even if you never meet a convert, you fulfill it by: (1) Never letting a newcomer at synagogue stand alone — always introduce yourself. (2) Speaking up when someone makes dismissive comments about Jews-by-choice. (3) Studying the laws of welcoming converts (Rambam, Hilchot De'ot 6:3) so you are prepared. (4) Donating to organizations that support people converting. (5) Remembering daily that your own ancestors were 'strangers in Egypt' — the shared memory of outsider status is meant to build empathy for anyone finding their place.",
   "Honor your father and mother":
     "Call or text a parent today just to say you're thinking of them. Ask how they're doing and truly listen.",
   "Rebuke a sinner":
@@ -713,7 +713,166 @@ export const MITZVAH_EXAMPLES: Record<string, string> = {
     "Before repeating anything negative about someone, ask: is it true, is it necessary, is it kind? All three must be yes.",
   "Do not stand idly by your fellow's blood":
     "If someone near you is in danger — physical, emotional, or otherwise — don't look away. Act, call for help, or speak up.",
+
+  // Convert-related mitzvot — practical daily fulfillment
+  "Do not oppress the convert verbally":
+    "Even without meeting a convert, this mitzvah is alive daily. Its core principle: never make anyone feel like an outsider because of their background. Today — (1) Stop yourself before any comment that implies someone 'isn't really Jewish.' (2) If you hear such a comment from others, gently push back. (3) Learn what makes language hurtful to people on the margins. (4) In any community setting, introduce yourself to someone new before they have to introduce themselves. Deuteronomy 10:19 reminds us: 'You were strangers in Egypt' — the experience of exclusion is meant to make us protectors of the included.",
+
+  "Do not wrong the convert in business":
+    "You don't need to meet a convert to live this. The principle is: never give someone worse treatment because of where they came from. Today — (1) Check your own assumptions about who deserves fair treatment. (2) If you're in a leadership role, ensure your hiring, pricing, or service decisions don't disadvantage outsiders. (3) Read the halachic sources on ona'at ger (oppressing the stranger) — the prohibition appears 36 times in the Torah, which the Sages say is because converts are especially vulnerable to mistreatment.",
+
+  "Do not harm a convert with words":
+    "The most common way to violate this is by saying things like 'your mother wasn't Jewish' or implying a Jew-by-choice is less authentic. Even if you never meet one, build the right habits now: (1) When discussing Jewish identity, be careful never to rank 'types' of Jews. (2) Speak up when you hear convert-shaming, even casually. (3) Study the halachic status of a ger tzedek — after conversion they are a full Jew in every sense. (4) If you lead any Jewish learning, make it clear that everyone's path to Torah is honored.",
+
+  "Love the stranger who dwells among you":
+    "Deuteronomy 10:18–19 says God 'loves the stranger, giving him food and clothing' — and commands us to do the same. Today: (1) Check whether your synagogue or community actively welcomes visitors or makes them feel invisible. (2) If you notice someone sitting alone at services, go sit near them. (3) Support a local organization that serves immigrants, refugees, or the homeless — all are 'strangers.' (4) Practice the daily intention of noticing people on the margins before you notice people at the center.",
+
+  "Treat the convert with love":
+    "Rambam writes that a convert must be treated with extra kindness precisely because they chose this path with no family obligation behind them. Without a convert in your life, you can still: (1) Learn the laws of ger tzedek (Hilchot Issurei Biah ch. 14) so you're prepared to treat them right. (2) Donate to organizations like the Jewish Conversion Support Network. (3) Make your home an explicitly welcoming space — anyone who is newly Jewish should feel at home at your Shabbat table. (4) Reflect on your own 'stranger' experiences and let them soften you toward others.",
+
+  "Do not cause pain to any living creature (tza'ar ba'alei chayyim)":
+    "The Torah's concern for animals is real and detailed. Today: (1) Be mindful of how your consumer choices affect animal welfare — buy humanely raised products when possible. (2) If you see an animal in distress, don't walk past. (3) Feed an animal before feeding yourself (Berachot 40a). (4) Thank God for the complexity of living creatures — recite a bracha when you see an unusual animal for the first time.",
 };
+
+// Sefaria source links — specific Torah verse URLs
+export const SEFARIA_SOURCES: Record<string, string> = {
+  "Believe in God's existence": "https://www.sefaria.org/Exodus.20.2",
+  "Accept God's complete unity": "https://www.sefaria.org/Deuteronomy.6.4",
+  "Love God with all your heart": "https://www.sefaria.org/Deuteronomy.6.5",
+  "Fear and revere God": "https://www.sefaria.org/Deuteronomy.10.20",
+  "Sanctify God's name publicly": "https://www.sefaria.org/Leviticus.22.32",
+  "Study Torah day and night": "https://www.sefaria.org/Deuteronomy.6.7",
+  "Teach Torah to others": "https://www.sefaria.org/Deuteronomy.6.7",
+  "Recite the Shema morning and evening": "https://www.sefaria.org/Deuteronomy.6.4",
+  "Wear tefillin on the arm": "https://www.sefaria.org/Deuteronomy.6.8",
+  "Wear tefillin on the head": "https://www.sefaria.org/Deuteronomy.6.8",
+  "Affix a mezuzah to every doorpost": "https://www.sefaria.org/Deuteronomy.6.9",
+  "Every person shall write a Torah scroll": "https://www.sefaria.org/Deuteronomy.31.19",
+  "Wear tzitzit": "https://www.sefaria.org/Numbers.15.38",
+  "Recite Birkat Hamazon after eating bread": "https://www.sefaria.org/Deuteronomy.8.10",
+  "Love your neighbor as yourself": "https://www.sefaria.org/Leviticus.19.18",
+  "Love the convert": "https://www.sefaria.org/Deuteronomy.10.19",
+  "Love the stranger who dwells among you": "https://www.sefaria.org/Deuteronomy.10.19",
+  "Treat the convert with love": "https://www.sefaria.org/Leviticus.19.34",
+  "Honor your father and mother": "https://www.sefaria.org/Exodus.20.12",
+  "Honor the elderly and the wise": "https://www.sefaria.org/Leviticus.19.32",
+  "Give charity generously": "https://www.sefaria.org/Deuteronomy.15.8",
+  "Lend money to the poor": "https://www.sefaria.org/Deuteronomy.15.8",
+  "Pay the hired laborer on time": "https://www.sefaria.org/Deuteronomy.24.15",
+  "Return a lost object to its owner": "https://www.sefaria.org/Deuteronomy.22.1",
+  "Help unload a collapsed animal": "https://www.sefaria.org/Exodus.23.5",
+  "Rebuke a sinner": "https://www.sefaria.org/Leviticus.19.17",
+  "Rest on the Shabbat": "https://www.sefaria.org/Exodus.20.10",
+  "Honor the Shabbat through speech (Kiddush)": "https://www.sefaria.org/Exodus.20.8",
+  "Sanctify the Shabbat through Kiddush": "https://www.sefaria.org/Exodus.20.8",
+  "Kindle Shabbat lights before sunset Friday": "https://www.sefaria.org/Exodus.35.3",
+  "Eat matzah on the first night of Passover": "https://www.sefaria.org/Exodus.12.18",
+  "Tell the Exodus story on Passover night (Seder)": "https://www.sefaria.org/Exodus.13.8",
+  "Remove all chametz before Passover": "https://www.sefaria.org/Exodus.12.15",
+  "Count the Omer — 49 days from Passover to Shavuot": "https://www.sefaria.org/Leviticus.23.15",
+  "Say Sefiras HaOmer each night": "https://www.sefaria.org/Leviticus.23.15",
+  "Blow the shofar on Rosh Hashanah": "https://www.sefaria.org/Numbers.29.1",
+  "Fast and afflict yourself on Yom Kippur": "https://www.sefaria.org/Leviticus.23.27",
+  "Dwell in the sukkah during Sukkot": "https://www.sefaria.org/Leviticus.23.42",
+  "Take the four species on Sukkot": "https://www.sefaria.org/Leviticus.23.40",
+  "Circumcise all males on the eighth day": "https://www.sefaria.org/Genesis.17.12",
+  "Sanctify the new month (Rosh Chodesh)": "https://www.sefaria.org/Exodus.12.2",
+  "Remember the Exodus from Egypt daily": "https://www.sefaria.org/Deuteronomy.16.3",
+  "Bury the dead": "https://www.sefaria.org/Deuteronomy.21.23",
+  "Recite Hallel on designated festival days": "https://www.sefaria.org/Psalms.113.1",
+  "Do not murder": "https://www.sefaria.org/Exodus.20.13",
+  "Do not commit adultery": "https://www.sefaria.org/Exodus.20.13",
+  "Do not steal": "https://www.sefaria.org/Exodus.20.13",
+  "Do not bear false witness against your neighbor": "https://www.sefaria.org/Exodus.20.13",
+  "Do not covet your neighbor's house": "https://www.sefaria.org/Exodus.20.14",
+  "Do not covet your neighbor's wife": "https://www.sefaria.org/Exodus.20.14",
+  "Do not take God's name in vain": "https://www.sefaria.org/Exodus.20.7",
+  "Do not swear falsely": "https://www.sefaria.org/Leviticus.19.12",
+  "Do not swear unnecessarily": "https://www.sefaria.org/Leviticus.5.4",
+  "Do not hate your brother in your heart": "https://www.sefaria.org/Leviticus.19.17",
+  "Do not embarrass anyone publicly": "https://www.sefaria.org/Leviticus.19.17",
+  "Do not take revenge": "https://www.sefaria.org/Leviticus.19.18",
+  "Do not bear a grudge": "https://www.sefaria.org/Leviticus.19.18",
+  "Do not take revenge or bear a grudge against your people": "https://www.sefaria.org/Leviticus.19.18",
+  "Do not spread false reports or slander": "https://www.sefaria.org/Leviticus.19.16",
+  "Do not stand idly by your fellow's blood": "https://www.sefaria.org/Leviticus.19.16",
+  "Do not oppress the stranger among you": "https://www.sefaria.org/Exodus.22.20",
+  "Do not oppress the convert verbally": "https://www.sefaria.org/Exodus.22.20",
+  "Do not wrong the convert in business": "https://www.sefaria.org/Exodus.22.20",
+  "Do not harm a convert with words": "https://www.sefaria.org/Leviticus.19.33",
+  "Do not afflict the widow and orphan": "https://www.sefaria.org/Exodus.22.21",
+  "Do not wrong the widow and orphan": "https://www.sefaria.org/Exodus.22.21",
+  "Do not charge interest to a Jew": "https://www.sefaria.org/Leviticus.25.37",
+  "Do not pervert justice": "https://www.sefaria.org/Leviticus.19.15",
+  "Do not favor the poor in judgment": "https://www.sefaria.org/Leviticus.19.15",
+  "Do not favor the rich in judgment": "https://www.sefaria.org/Leviticus.19.15",
+  "Do not accept bribes": "https://www.sefaria.org/Exodus.23.8",
+  "Do not eat blood": "https://www.sefaria.org/Leviticus.17.14",
+  "Do not eat chametz on Passover": "https://www.sefaria.org/Exodus.12.20",
+  "Do not have chametz in your possession on Passover at all": "https://www.sefaria.org/Exodus.13.7",
+  "Do not add to the Torah's commandments": "https://www.sefaria.org/Deuteronomy.13.1",
+  "Do not subtract from the Torah's commandments": "https://www.sefaria.org/Deuteronomy.13.1",
+  "Do not follow the majority to do evil": "https://www.sefaria.org/Exodus.23.2",
+  "Do not erase God's name": "https://www.sefaria.org/Deuteronomy.12.4",
+  "Do not delay fulfilling a vow to God": "https://www.sefaria.org/Deuteronomy.23.22",
+  "Do not eat the sinew of the thigh vein (gid hanasheh)": "https://www.sefaria.org/Genesis.32.33",
+  "Do not eat a limb torn from a living animal (ever min hachai)": "https://www.sefaria.org/Genesis.9.4",
+  "Do not crossbreed different species of animals": "https://www.sefaria.org/Leviticus.19.19",
+  "Do not plant different species in a vineyard (kil'ayim)": "https://www.sefaria.org/Leviticus.19.19",
+  "Do not wear mixed wool and linen (shatnez)": "https://www.sefaria.org/Leviticus.19.19",
+  "Do not tattoo yourself": "https://www.sefaria.org/Leviticus.19.28",
+  "Do not cut your skin in mourning": "https://www.sefaria.org/Leviticus.19.28",
+  "Do not round the corners of your head": "https://www.sefaria.org/Leviticus.19.27",
+  "Do not shave the corners of your beard": "https://www.sefaria.org/Leviticus.19.27",
+  "Do not move a boundary marker": "https://www.sefaria.org/Deuteronomy.19.14",
+  "Do not return to Egypt to live permanently": "https://www.sefaria.org/Deuteronomy.17.16",
+  "Do not destroy fruit trees during a siege": "https://www.sefaria.org/Deuteronomy.20.19",
+  "Do not work on the first day of Passover": "https://www.sefaria.org/Leviticus.23.8",
+  "Do not work on Shavuot": "https://www.sefaria.org/Leviticus.23.21",
+  "Do not work on Rosh Hashanah": "https://www.sefaria.org/Leviticus.23.25",
+  "Do not work on Yom Kippur": "https://www.sefaria.org/Leviticus.23.31",
+  "Do not work on the first day of Sukkot": "https://www.sefaria.org/Leviticus.23.35",
+  "Do not work on Shemini Atzeret": "https://www.sefaria.org/Leviticus.23.36",
+  "Do not work on the Shabbat": "https://www.sefaria.org/Exodus.20.10",
+};
+
+export function getSefariaUrl(mitzvah: string): string {
+  return SEFARIA_SOURCES[mitzvah] ?? `https://www.sefaria.org/search#query=${encodeURIComponent(mitzvah)}`;
+}
+
+// Completed mitzvahs hook — persisted in localStorage
+const COMPLETED_KEY = "mitzvah-wheel-completed";
+
+export function useCompletedMitzvahs() {
+  const [completed, setCompleted] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem(COMPLETED_KEY);
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const toggleCompleted = (mitzvah: string) => {
+    setCompleted((prev) => {
+      const next = new Set(prev);
+      if (next.has(mitzvah)) {
+        next.delete(mitzvah);
+      } else {
+        next.add(mitzvah);
+      }
+      localStorage.setItem(COMPLETED_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const clearCompleted = () => {
+    setCompleted(new Set());
+    localStorage.removeItem(COMPLETED_KEY);
+  };
+
+  return { completed, toggleCompleted, clearCompleted };
+}
 
 const STORAGE_KEY = "mitzvah-wheel-list";
 const STORAGE_VERSION_KEY = "mitzvah-wheel-version";
