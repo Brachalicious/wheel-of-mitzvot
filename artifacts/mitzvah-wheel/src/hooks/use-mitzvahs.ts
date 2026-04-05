@@ -734,110 +734,173 @@ export const MITZVAH_EXAMPLES: Record<string, string> = {
     "The Torah's concern for animals is real and detailed. Today: (1) Be mindful of how your consumer choices affect animal welfare — buy humanely raised products when possible. (2) If you see an animal in distress, don't walk past. (3) Feed an animal before feeding yourself (Berachot 40a). (4) Thank God for the complexity of living creatures — recite a bracha when you see an unusual animal for the first time.",
 };
 
-// Sefaria source links — specific Torah verse URLs
-export const SEFARIA_SOURCES: Record<string, string> = {
-  "Believe in God's existence": "https://www.sefaria.org/Exodus.20.2",
-  "Accept God's complete unity": "https://www.sefaria.org/Deuteronomy.6.4",
-  "Love God with all your heart": "https://www.sefaria.org/Deuteronomy.6.5",
-  "Fear and revere God": "https://www.sefaria.org/Deuteronomy.10.20",
-  "Sanctify God's name publicly": "https://www.sefaria.org/Leviticus.22.32",
-  "Study Torah day and night": "https://www.sefaria.org/Deuteronomy.6.7",
-  "Teach Torah to others": "https://www.sefaria.org/Deuteronomy.6.7",
-  "Recite the Shema morning and evening": "https://www.sefaria.org/Deuteronomy.6.4",
-  "Wear tefillin on the arm": "https://www.sefaria.org/Deuteronomy.6.8",
-  "Wear tefillin on the head": "https://www.sefaria.org/Deuteronomy.6.8",
-  "Affix a mezuzah to every doorpost": "https://www.sefaria.org/Deuteronomy.6.9",
-  "Every person shall write a Torah scroll": "https://www.sefaria.org/Deuteronomy.31.19",
-  "Wear tzitzit": "https://www.sefaria.org/Numbers.15.38",
-  "Recite Birkat Hamazon after eating bread": "https://www.sefaria.org/Deuteronomy.8.10",
-  "Love your neighbor as yourself": "https://www.sefaria.org/Leviticus.19.18",
-  "Love the convert": "https://www.sefaria.org/Deuteronomy.10.19",
-  "Love the stranger who dwells among you": "https://www.sefaria.org/Deuteronomy.10.19",
-  "Treat the convert with love": "https://www.sefaria.org/Leviticus.19.34",
-  "Honor your father and mother": "https://www.sefaria.org/Exodus.20.12",
-  "Honor the elderly and the wise": "https://www.sefaria.org/Leviticus.19.32",
-  "Give charity generously": "https://www.sefaria.org/Deuteronomy.15.8",
-  "Lend money to the poor": "https://www.sefaria.org/Deuteronomy.15.8",
-  "Pay the hired laborer on time": "https://www.sefaria.org/Deuteronomy.24.15",
-  "Return a lost object to its owner": "https://www.sefaria.org/Deuteronomy.22.1",
-  "Help unload a collapsed animal": "https://www.sefaria.org/Exodus.23.5",
-  "Rebuke a sinner": "https://www.sefaria.org/Leviticus.19.17",
-  "Rest on the Shabbat": "https://www.sefaria.org/Exodus.20.10",
-  "Honor the Shabbat through speech (Kiddush)": "https://www.sefaria.org/Exodus.20.8",
-  "Sanctify the Shabbat through Kiddush": "https://www.sefaria.org/Exodus.20.8",
-  "Kindle Shabbat lights before sunset Friday": "https://www.sefaria.org/Exodus.35.3",
-  "Eat matzah on the first night of Passover": "https://www.sefaria.org/Exodus.12.18",
-  "Tell the Exodus story on Passover night (Seder)": "https://www.sefaria.org/Exodus.13.8",
-  "Remove all chametz before Passover": "https://www.sefaria.org/Exodus.12.15",
-  "Count the Omer — 49 days from Passover to Shavuot": "https://www.sefaria.org/Leviticus.23.15",
-  "Say Sefiras HaOmer each night": "https://www.sefaria.org/Leviticus.23.15",
-  "Blow the shofar on Rosh Hashanah": "https://www.sefaria.org/Numbers.29.1",
-  "Fast and afflict yourself on Yom Kippur": "https://www.sefaria.org/Leviticus.23.27",
-  "Dwell in the sukkah during Sukkot": "https://www.sefaria.org/Leviticus.23.42",
-  "Take the four species on Sukkot": "https://www.sefaria.org/Leviticus.23.40",
-  "Circumcise all males on the eighth day": "https://www.sefaria.org/Genesis.17.12",
-  "Sanctify the new month (Rosh Chodesh)": "https://www.sefaria.org/Exodus.12.2",
-  "Remember the Exodus from Egypt daily": "https://www.sefaria.org/Deuteronomy.16.3",
-  "Bury the dead": "https://www.sefaria.org/Deuteronomy.21.23",
-  "Recite Hallel on designated festival days": "https://www.sefaria.org/Psalms.113.1",
-  "Do not murder": "https://www.sefaria.org/Exodus.20.13",
-  "Do not commit adultery": "https://www.sefaria.org/Exodus.20.13",
-  "Do not steal": "https://www.sefaria.org/Exodus.20.13",
-  "Do not bear false witness against your neighbor": "https://www.sefaria.org/Exodus.20.13",
-  "Do not covet your neighbor's house": "https://www.sefaria.org/Exodus.20.14",
-  "Do not covet your neighbor's wife": "https://www.sefaria.org/Exodus.20.14",
-  "Do not take God's name in vain": "https://www.sefaria.org/Exodus.20.7",
-  "Do not swear falsely": "https://www.sefaria.org/Leviticus.19.12",
-  "Do not swear unnecessarily": "https://www.sefaria.org/Leviticus.5.4",
-  "Do not hate your brother in your heart": "https://www.sefaria.org/Leviticus.19.17",
-  "Do not embarrass anyone publicly": "https://www.sefaria.org/Leviticus.19.17",
-  "Do not take revenge": "https://www.sefaria.org/Leviticus.19.18",
-  "Do not bear a grudge": "https://www.sefaria.org/Leviticus.19.18",
-  "Do not take revenge or bear a grudge against your people": "https://www.sefaria.org/Leviticus.19.18",
-  "Do not spread false reports or slander": "https://www.sefaria.org/Leviticus.19.16",
-  "Do not stand idly by your fellow's blood": "https://www.sefaria.org/Leviticus.19.16",
-  "Do not oppress the stranger among you": "https://www.sefaria.org/Exodus.22.20",
-  "Do not oppress the convert verbally": "https://www.sefaria.org/Exodus.22.20",
-  "Do not wrong the convert in business": "https://www.sefaria.org/Exodus.22.20",
-  "Do not harm a convert with words": "https://www.sefaria.org/Leviticus.19.33",
-  "Do not afflict the widow and orphan": "https://www.sefaria.org/Exodus.22.21",
-  "Do not wrong the widow and orphan": "https://www.sefaria.org/Exodus.22.21",
-  "Do not charge interest to a Jew": "https://www.sefaria.org/Leviticus.25.37",
-  "Do not pervert justice": "https://www.sefaria.org/Leviticus.19.15",
-  "Do not favor the poor in judgment": "https://www.sefaria.org/Leviticus.19.15",
-  "Do not favor the rich in judgment": "https://www.sefaria.org/Leviticus.19.15",
-  "Do not accept bribes": "https://www.sefaria.org/Exodus.23.8",
-  "Do not eat blood": "https://www.sefaria.org/Leviticus.17.14",
-  "Do not eat chametz on Passover": "https://www.sefaria.org/Exodus.12.20",
-  "Do not have chametz in your possession on Passover at all": "https://www.sefaria.org/Exodus.13.7",
-  "Do not add to the Torah's commandments": "https://www.sefaria.org/Deuteronomy.13.1",
-  "Do not subtract from the Torah's commandments": "https://www.sefaria.org/Deuteronomy.13.1",
-  "Do not follow the majority to do evil": "https://www.sefaria.org/Exodus.23.2",
-  "Do not erase God's name": "https://www.sefaria.org/Deuteronomy.12.4",
-  "Do not delay fulfilling a vow to God": "https://www.sefaria.org/Deuteronomy.23.22",
-  "Do not eat the sinew of the thigh vein (gid hanasheh)": "https://www.sefaria.org/Genesis.32.33",
-  "Do not eat a limb torn from a living animal (ever min hachai)": "https://www.sefaria.org/Genesis.9.4",
-  "Do not crossbreed different species of animals": "https://www.sefaria.org/Leviticus.19.19",
-  "Do not plant different species in a vineyard (kil'ayim)": "https://www.sefaria.org/Leviticus.19.19",
-  "Do not wear mixed wool and linen (shatnez)": "https://www.sefaria.org/Leviticus.19.19",
-  "Do not tattoo yourself": "https://www.sefaria.org/Leviticus.19.28",
-  "Do not cut your skin in mourning": "https://www.sefaria.org/Leviticus.19.28",
-  "Do not round the corners of your head": "https://www.sefaria.org/Leviticus.19.27",
-  "Do not shave the corners of your beard": "https://www.sefaria.org/Leviticus.19.27",
-  "Do not move a boundary marker": "https://www.sefaria.org/Deuteronomy.19.14",
-  "Do not return to Egypt to live permanently": "https://www.sefaria.org/Deuteronomy.17.16",
-  "Do not destroy fruit trees during a siege": "https://www.sefaria.org/Deuteronomy.20.19",
-  "Do not work on the first day of Passover": "https://www.sefaria.org/Leviticus.23.8",
-  "Do not work on Shavuot": "https://www.sefaria.org/Leviticus.23.21",
-  "Do not work on Rosh Hashanah": "https://www.sefaria.org/Leviticus.23.25",
-  "Do not work on Yom Kippur": "https://www.sefaria.org/Leviticus.23.31",
-  "Do not work on the first day of Sukkot": "https://www.sefaria.org/Leviticus.23.35",
-  "Do not work on Shemini Atzeret": "https://www.sefaria.org/Leviticus.23.36",
-  "Do not work on the Shabbat": "https://www.sefaria.org/Exodus.20.10",
+// Structured Torah source data — Parsha, Book, Chapter, Verse
+export interface MitzvahSource {
+  parsha: string;
+  book: string;
+  chapter: number;
+  verse: number;
+}
+
+export const MITZVAH_SOURCES: Record<string, MitzvahSource> = {
+  // Genesis (Bereishit)
+  "Do not eat a limb torn from a living animal (ever min hachai)": { parsha: "Noach", book: "Genesis", chapter: 9, verse: 4 },
+  "Circumcise all males on the eighth day": { parsha: "Lech Lecha", book: "Genesis", chapter: 17, verse: 12 },
+  "Do not eat the sinew of the thigh vein (gid hanasheh)": { parsha: "Vayishlach", book: "Genesis", chapter: 32, verse: 33 },
+
+  // Exodus — Bo
+  "Sanctify the new month (Rosh Chodesh)": { parsha: "Bo", book: "Exodus", chapter: 12, verse: 2 },
+  "Eat matzah on the first night of Passover": { parsha: "Bo", book: "Exodus", chapter: 12, verse: 18 },
+  "Remove all chametz before Passover": { parsha: "Bo", book: "Exodus", chapter: 12, verse: 15 },
+  "Do not eat chametz on Passover": { parsha: "Bo", book: "Exodus", chapter: 12, verse: 20 },
+  "Tell the Exodus story on Passover night (Seder)": { parsha: "Bo", book: "Exodus", chapter: 13, verse: 8 },
+  "Do not have chametz in your possession on Passover at all": { parsha: "Bo", book: "Exodus", chapter: 13, verse: 7 },
+  "Wear tefillin on the arm": { parsha: "Bo", book: "Exodus", chapter: 13, verse: 9 },
+  "Wear tefillin on the head": { parsha: "Bo", book: "Exodus", chapter: 13, verse: 16 },
+  "Sanctify the firstborn son": { parsha: "Bo", book: "Exodus", chapter: 13, verse: 2 },
+
+  // Exodus — Yitro (Ten Commandments)
+  "Believe in God's existence": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 2 },
+  "Do not believe in any god besides God": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 3 },
+  "Do not make an idol for yourself": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 4 },
+  "Do not take God's name in vain": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 7 },
+  "Honor the Shabbat through speech (Kiddush)": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 8 },
+  "Sanctify the Shabbat through Kiddush": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 8 },
+  "Rest on the Shabbat": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 10 },
+  "Do not work on the Shabbat": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 10 },
+  "Honor your father and mother": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 12 },
+  "Do not murder": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 13 },
+  "Do not commit adultery": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 13 },
+  "Do not steal": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 13 },
+  "Do not bear false witness against your neighbor": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 13 },
+  "Do not covet your neighbor's house": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 14 },
+  "Do not covet your neighbor's wife": { parsha: "Yitro", book: "Exodus", chapter: 20, verse: 14 },
+
+  // Exodus — Mishpatim
+  "Help unload a collapsed animal": { parsha: "Mishpatim", book: "Exodus", chapter: 23, verse: 5 },
+  "Do not follow the majority to do evil": { parsha: "Mishpatim", book: "Exodus", chapter: 23, verse: 2 },
+  "Do not oppress the stranger among you": { parsha: "Mishpatim", book: "Exodus", chapter: 22, verse: 20 },
+  "Do not oppress the convert verbally": { parsha: "Mishpatim", book: "Exodus", chapter: 22, verse: 20 },
+  "Do not wrong the convert in business": { parsha: "Mishpatim", book: "Exodus", chapter: 22, verse: 20 },
+  "Do not afflict the widow and orphan": { parsha: "Mishpatim", book: "Exodus", chapter: 22, verse: 21 },
+  "Do not wrong the widow and orphan": { parsha: "Mishpatim", book: "Exodus", chapter: 22, verse: 21 },
+  "Do not accept bribes": { parsha: "Mishpatim", book: "Exodus", chapter: 23, verse: 8 },
+
+  // Exodus — Vayakhel
+  "Kindle Shabbat lights before sunset Friday": { parsha: "Vayakhel", book: "Exodus", chapter: 35, verse: 3 },
+
+  // Leviticus — Vayikra
+  "Do not swear unnecessarily": { parsha: "Vayikra", book: "Leviticus", chapter: 5, verse: 4 },
+
+  // Leviticus — Acharei Mot
+  "Do not eat blood": { parsha: "Acharei Mot", book: "Leviticus", chapter: 17, verse: 14 },
+
+  // Leviticus — Kedoshim
+  "Love your neighbor as yourself": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 18 },
+  "Treat the convert with love": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 34 },
+  "Honor the elderly and the wise": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 32 },
+  "Rebuke a sinner": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 17 },
+  "Do not hate your brother in your heart": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 17 },
+  "Do not embarrass anyone publicly": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 17 },
+  "Do not take revenge": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 18 },
+  "Do not bear a grudge": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 18 },
+  "Do not take revenge or bear a grudge against your people": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 18 },
+  "Do not spread false reports or slander": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 16 },
+  "Do not stand idly by your fellow's blood": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 16 },
+  "Do not pervert justice": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 15 },
+  "Do not favor the poor in judgment": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 15 },
+  "Do not favor the rich in judgment": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 15 },
+  "Do not swear falsely": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 12 },
+  "Do not tattoo yourself": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 28 },
+  "Do not cut your skin in mourning": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 28 },
+  "Do not round the corners of your head": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 27 },
+  "Do not shave the corners of your beard": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 27 },
+  "Do not crossbreed different species of animals": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 19 },
+  "Do not plant different species in a vineyard (kil'ayim)": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 19 },
+  "Do not wear mixed wool and linen (shatnez)": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 19 },
+  "Do not harm a convert with words": { parsha: "Kedoshim", book: "Leviticus", chapter: 19, verse: 33 },
+
+  // Leviticus — Emor
+  "Sanctify God's name publicly": { parsha: "Emor", book: "Leviticus", chapter: 22, verse: 32 },
+  "Count the Omer — 49 days from Passover to Shavuot": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 15 },
+  "Say Sefiras HaOmer each night": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 15 },
+  "Fast and afflict yourself on Yom Kippur": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 27 },
+  "Dwell in the sukkah during Sukkot": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 42 },
+  "Take the four species on Sukkot": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 40 },
+  "Do not work on the first day of Passover": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 8 },
+  "Do not work on Shavuot": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 21 },
+  "Do not work on Rosh Hashanah": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 25 },
+  "Do not work on Yom Kippur": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 31 },
+  "Do not work on the first day of Sukkot": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 35 },
+  "Do not work on Shemini Atzeret": { parsha: "Emor", book: "Leviticus", chapter: 23, verse: 36 },
+
+  // Leviticus — Behar
+  "Observe the sabbatical year (sh'mittah)": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 4 },
+  "Do not charge interest to a Jew": { parsha: "Behar", book: "Leviticus", chapter: 25, verse: 37 },
+
+  // Numbers — Shelach
+  "Wear tzitzit": { parsha: "Shelach", book: "Numbers", chapter: 15, verse: 38 },
+
+  // Numbers — Pinchas
+  "Blow the shofar on Rosh Hashanah": { parsha: "Pinchas", book: "Numbers", chapter: 29, verse: 1 },
+
+  // Deuteronomy — Vaetchanan
+  "Accept God's complete unity": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 4 },
+  "Recite the Shema morning and evening": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 4 },
+  "Love God with all your heart": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 5 },
+  "Study Torah day and night": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 7 },
+  "Teach Torah to others": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 7 },
+  "Affix a mezuzah to every doorpost": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 9 },
+
+  // Deuteronomy — Eikev
+  "Fear and revere God": { parsha: "Eikev", book: "Deuteronomy", chapter: 10, verse: 20 },
+  "Love the convert": { parsha: "Eikev", book: "Deuteronomy", chapter: 10, verse: 19 },
+  "Love the stranger who dwells among you": { parsha: "Eikev", book: "Deuteronomy", chapter: 10, verse: 19 },
+  "Recite Birkat Hamazon after eating bread": { parsha: "Eikev", book: "Deuteronomy", chapter: 8, verse: 10 },
+
+  // Deuteronomy — Re'eh
+  "Give charity generously": { parsha: "Re'eh", book: "Deuteronomy", chapter: 15, verse: 8 },
+  "Lend money to the poor": { parsha: "Re'eh", book: "Deuteronomy", chapter: 15, verse: 8 },
+  "Remember the Exodus from Egypt daily": { parsha: "Re'eh", book: "Deuteronomy", chapter: 16, verse: 3 },
+  "Do not add to the Torah's commandments": { parsha: "Re'eh", book: "Deuteronomy", chapter: 13, verse: 1 },
+  "Do not subtract from the Torah's commandments": { parsha: "Re'eh", book: "Deuteronomy", chapter: 13, verse: 1 },
+  "Do not erase God's name": { parsha: "Re'eh", book: "Deuteronomy", chapter: 12, verse: 4 },
+
+  // Deuteronomy — Shoftim
+  "Do not move a boundary marker": { parsha: "Shoftim", book: "Deuteronomy", chapter: 19, verse: 14 },
+  "Do not return to Egypt to live permanently": { parsha: "Shoftim", book: "Deuteronomy", chapter: 17, verse: 16 },
+  "Do not destroy fruit trees during a siege": { parsha: "Shoftim", book: "Deuteronomy", chapter: 20, verse: 19 },
+
+  // Deuteronomy — Ki Tetzei
+  "Pay the hired laborer on time": { parsha: "Ki Tetzei", book: "Deuteronomy", chapter: 24, verse: 15 },
+  "Return a lost object to its owner": { parsha: "Ki Tetzei", book: "Deuteronomy", chapter: 22, verse: 1 },
+  "Bury the dead": { parsha: "Ki Tetzei", book: "Deuteronomy", chapter: 21, verse: 23 },
+  "Do not delay fulfilling a vow to God": { parsha: "Ki Tetzei", book: "Deuteronomy", chapter: 23, verse: 22 },
+
+  // Deuteronomy — Vayelech
+  "Every person shall write a Torah scroll": { parsha: "Vayelech", book: "Deuteronomy", chapter: 31, verse: 19 },
+
+  // Psalms (Hallel)
+  "Recite Hallel on designated festival days": { parsha: "Tehillim / Hallel", book: "Psalms", chapter: 113, verse: 1 },
 };
 
+export function getMitzvahSource(mitzvah: string): MitzvahSource | null {
+  return MITZVAH_SOURCES[mitzvah] ?? null;
+}
+
 export function getSefariaUrl(mitzvah: string): string {
-  return SEFARIA_SOURCES[mitzvah] ?? `https://www.sefaria.org/search#query=${encodeURIComponent(mitzvah)}`;
+  const s = MITZVAH_SOURCES[mitzvah];
+  if (!s) return `https://www.sefaria.org/search#query=${encodeURIComponent(mitzvah)}`;
+  return `https://www.sefaria.org/${s.book}.${s.chapter}.${s.verse}`;
+}
+
+export function formatVerseRef(s: MitzvahSource): string {
+  const abbrev: Record<string, string> = {
+    Genesis: "Gen", Exodus: "Ex", Leviticus: "Lev", Numbers: "Num",
+    Deuteronomy: "Deut", Psalms: "Ps",
+  };
+  const short = abbrev[s.book] ?? s.book;
+  return `${short} ${s.chapter}:${s.verse}`;
 }
 
 // Completed mitzvahs hook — persisted in localStorage

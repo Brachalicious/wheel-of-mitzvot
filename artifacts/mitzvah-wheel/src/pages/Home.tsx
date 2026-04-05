@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl } from "@/hooks/use-mitzvahs";
+import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef } from "@/hooks/use-mitzvahs";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
 import { Button } from "@/components/ui/button";
@@ -190,18 +190,32 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* Sefaria link + Done checkbox */}
-                  <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
-                    <a
-                      href={getSefariaUrl(selected.name)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
-                      data-testid="sefaria-link"
-                    >
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                      View source on Sefaria
-                    </a>
+                  {/* Torah source + Done checkbox */}
+                  {(() => {
+                    const src = getMitzvahSource(selected.name);
+                    return (
+                      <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
+                        <div className="flex flex-col gap-0.5">
+                          {src && (
+                            <span className="text-xs text-muted-foreground font-serif">
+                              Parshat <span className="font-semibold text-foreground">{src.parsha}</span>
+                              {" · "}
+                              <span className="font-medium">{src.book} {src.chapter}:{src.verse}</span>
+                            </span>
+                          )}
+                          <a
+                            href={getSefariaUrl(selected.name)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+                            data-testid="sefaria-link"
+                          >
+                            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                            {src
+                              ? `Open ${formatVerseRef(src)} on Sefaria`
+                              : "Search on Sefaria"}
+                          </a>
+                        </div>
 
                     <label
                       className="flex items-center gap-2 cursor-pointer select-none group"
@@ -218,7 +232,9 @@ export default function Home() {
                         {isSelectedDone ? "Done!" : "Mark as done"}
                       </span>
                     </label>
-                  </div>
+                      </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             </div>
