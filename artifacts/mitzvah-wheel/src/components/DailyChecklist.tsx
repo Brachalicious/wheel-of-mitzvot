@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useDailyChecklist, DailyItem } from "@/hooks/use-daily-checklist";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
+import { useOmer } from "@/hooks/use-omer";
+import { useShmiras } from "@/hooks/use-shmiras-halashon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,12 +19,20 @@ const CATEGORY_META: Record<DailyItem["category"], { label: string; color: strin
 export function DailyChecklist() {
   const { items, done, toggle, addItem, removeItem, resetDay } = useDailyChecklist();
   const hdate = useHebrewDate();
+  const omer = useOmer();
+  const shl = useShmiras();
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [showAdd, setShowAdd] = useState(false);
 
-  const doneCount = items.filter((i) => done.has(i.id)).length;
-  const total = items.length;
+  // Only include the Omer item when we are actually in the Omer period
+  const visibleItems = items.filter((i) => {
+    if (i.id === "count-omer") return omer !== null;
+    return true;
+  });
+
+  const doneCount = visibleItems.filter((i) => done.has(i.id)).length;
+  const total = visibleItems.length;
   const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
   const handleAdd = (e: React.FormEvent) => {
@@ -34,6 +44,28 @@ export function DailyChecklist() {
       setShowAdd(false);
     }
   };
+
+  /** Returns the effective description for items whose content changes daily */
+  function effectiveDescription(item: DailyItem): string {
+    if (item.id === "shmiras-halashon") {
+      return shl.description;
+    }
+    if (item.id === "count-omer" && omer) {
+      return `${omer.hebrewFormula} — ${omer.englishSummary}. Recite after nightfall with a blessing.`;
+    }
+    return item.description;
+  }
+
+  /** Returns the effective name (e.g. add Omer day number to the item name) */
+  function effectiveName(item: DailyItem): string {
+    if (item.id === "count-omer" && omer) {
+      return `Count the Omer — Day ${omer.day}${omer.isLagBaOmer ? " (Lag BaOmer!)" : ""}`;
+    }
+    if (item.id === "shmiras-halashon") {
+      return shl.title;
+    }
+    return item.name;
+  }
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -76,12 +108,50 @@ export function DailyChecklist() {
         </div>
       </div>
 
+      {/* Omer banner — only shown during the Omer period */}
+      {omer && (
+        <div
+          className={`flex-shrink-0 px-4 py-3 border-b border-border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
+            done.has("count-omer")
+              ? "bg-green-50 border-b-green-200"
+              : omer.isLagBaOmer
+                ? "bg-amber-50"
+                : "bg-indigo-50"
+          }`}
+          onClick={() => toggle("count-omer")}
+          data-testid="omer-banner"
+        >
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${omer.isLagBaOmer ? "text-amber-700" : "text-indigo-700"}`}>
+              {omer.isLagBaOmer ? "Lag BaOmer — Day 33" : `Sefirat HaOmer — Day ${omer.day} of 49`}
+            </p>
+            <p className="text-sm font-semibold text-foreground font-serif italic">
+              {omer.hebrewFormula}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">{omer.englishSummary} · Count after nightfall with a blessing</p>
+          </div>
+          <div className="flex-shrink-0">
+            {done.has("count-omer")
+              ? <CheckCircle2 className="w-6 h-6 text-green-600" />
+              : <Circle className={`w-6 h-6 ${omer.isLagBaOmer ? "text-amber-400" : "text-indigo-400"}`} />
+            }
+          </div>
+        </div>
+      )}
+
       {/* Checklist items */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-3 space-y-1.5">
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const isDone = done.has(item.id);
             const meta = CATEGORY_META[item.category];
+            const name = effectiveName(item);
+            const desc = effectiveDescription(item);
+            const isOmerItem = item.id === "count-omer"; // rendered in banner above, skip here
+            const isShl = item.id === "shmiras-halashon";
+
+            if (isOmerItem) return null; // already shown in the banner above
+
             return (
               <div
                 key={item.id}
@@ -89,28 +159,40 @@ export function DailyChecklist() {
                 className={`group flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                   isDone
                     ? "bg-green-50 border-green-200"
-                    : "bg-card border-border hover:border-primary/30 hover:bg-primary/3"
+                    : isShl
+                      ? "bg-amber-50/60 border-amber-200 hover:border-amber-400"
+                      : "bg-card border-border hover:border-primary/30 hover:bg-primary/3"
                 }`}
                 data-testid={`daily-item-${item.id}`}
               >
                 <div className="flex-shrink-0 mt-0.5">
                   {isDone
                     ? <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    : <Circle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    : <Circle className={`w-5 h-5 transition-colors ${isShl ? "text-amber-400 group-hover:text-amber-600" : "text-muted-foreground group-hover:text-primary"}`} />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-sm font-semibold leading-tight ${isDone ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                      {item.name}
+                      {name}
                     </span>
                     <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted ${meta.color}`}>
                       {meta.label}
                     </span>
+                    {isShl && (
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                        Chofetz Chaim
+                      </span>
+                    )}
                   </div>
-                  {item.description && (
+                  {desc && (
                     <p className="text-xs text-muted-foreground mt-0.5 leading-snug font-serif">
-                      {item.description}
+                      {desc}
+                    </p>
+                  )}
+                  {isShl && (
+                    <p className="text-[10px] text-amber-600 mt-1 font-medium">
+                      Sefer Chafetz Chaim / Sefer Shmirat HaLashon — Portion {shl.portionNumber} of 120
                     </p>
                   )}
                 </div>
