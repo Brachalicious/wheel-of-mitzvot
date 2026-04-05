@@ -2,6 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef } from "@/hooks/use-mitzvahs";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
+import { DailyChecklist } from "@/components/DailyChecklist";
+import { ProgressChart } from "@/components/ProgressChart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,9 +15,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
+import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2 } from "lucide-react";
 
 const WHEEL_SLOT_COUNT = 48;
+
+type Tab = "wheel" | "daily" | "progress";
 
 function pickRandom(arr: string[], n: number): string[] {
   const shuffled = [...arr].sort(() => Math.random() - 0.5);
@@ -30,6 +34,7 @@ interface SelectedMitzvah {
 export default function Home() {
   const { mitzvahs, isLoaded, addMitzvah, removeMitzvah, resetToDefaults } = useMitzvahs();
   const { completed, toggleCompleted, clearCompleted } = useCompletedMitzvahs();
+  const [tab, setTab] = useState<Tab>("wheel");
   const [spinning, setSpinning] = useState(false);
   const [selected, setSelected] = useState<SelectedMitzvah | null>(null);
   const [newMitzvah, setNewMitzvah] = useState("");
@@ -71,7 +76,6 @@ export default function Home() {
     }
   };
 
-  // Group mitzvahs alphabetically, stripping "Do not" prefix for sort key
   const grouped = useMemo(() => {
     const sorted = [...mitzvahs].sort((a, b) =>
       a.replace(/^Do not |^Don't /, "").localeCompare(b.replace(/^Do not |^Don't /, ""))
@@ -125,224 +129,260 @@ export default function Home() {
         )}
       </header>
 
-      {/* Main two-column layout */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-0">
+      {/* Tab bar */}
+      <div className="flex-shrink-0 flex border-b border-border bg-muted/30">
+        {(["wheel", "daily", "progress"] as Tab[]).map((t) => {
+          const labels: Record<Tab, string> = { wheel: "Wheel", daily: "Daily Checklist", progress: "My Progress" };
+          const icons: Record<Tab, React.ReactNode> = {
+            wheel: <Shuffle className="w-3.5 h-3.5" />,
+            daily: <ListChecks className="w-3.5 h-3.5" />,
+            progress: <BarChart2 className="w-3.5 h-3.5" />,
+          };
+          return (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+                tab === t
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {icons[t]}
+              {labels[t]}
+            </button>
+          );
+        })}
+      </div>
 
-        {/* ── LEFT: Wheel + Spin Button ── */}
-        <div className="flex flex-col items-center justify-center p-4 gap-3 min-h-0 border-r border-border overflow-hidden">
-          {/* Wheel sized to fill available space without overflowing */}
-          <div
-            className="w-full flex-shrink-0"
-            style={{ maxWidth: 'min(100%, calc(100vh - 210px))', maxHeight: 'calc(100vh - 210px)' }}
-          >
-            <Wheel
-              items={displayItems}
-              spinning={spinning}
-              setSpinning={setSpinning}
-              onSpinComplete={handleSpinComplete}
-            />
+      {/* Tab content */}
+      {tab === "daily" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <DailyChecklist />
+        </div>
+      )}
+
+      {tab === "progress" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <ProgressChart />
+        </div>
+      )}
+
+      {tab === "wheel" && (
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-0">
+
+          {/* ── LEFT: Wheel + Spin Button ── */}
+          <div className="flex flex-col items-center justify-center p-4 gap-3 min-h-0 border-r border-border overflow-hidden">
+            <div
+              className="w-full flex-shrink-0"
+              style={{ maxWidth: 'min(100%, calc(100vh - 230px))', maxHeight: 'calc(100vh - 230px)' }}
+            >
+              <Wheel
+                items={displayItems}
+                spinning={spinning}
+                setSpinning={setSpinning}
+                onSpinComplete={handleSpinComplete}
+              />
+            </div>
+
+            <Button
+              size="lg"
+              className="flex-shrink-0 w-full max-w-[280px] h-12 text-lg font-bold rounded-full shadow-lg hover:brightness-110 transition-all"
+              onClick={handleSpin}
+              disabled={spinning || mitzvahs.length === 0}
+              data-testid="spin-button"
+            >
+              <Shuffle className="w-5 h-5 mr-2" />
+              SPIN THE WHEEL
+            </Button>
           </div>
 
-          <Button
-            size="lg"
-            className="flex-shrink-0 w-full max-w-[280px] h-12 text-lg font-bold rounded-full shadow-lg hover:brightness-110 transition-all"
-            onClick={handleSpin}
-            disabled={spinning || mitzvahs.length === 0}
-            data-testid="spin-button"
-          >
-            <Shuffle className="w-5 h-5 mr-2" />
-            SPIN THE WHEEL
-          </Button>
-        </div>
+          {/* ── RIGHT: Result card + Add bar + Accordion list ── */}
+          <div className="flex flex-col min-h-0 overflow-hidden">
 
-        {/* ── RIGHT: Result card + Add bar + Accordion list ── */}
-        <div className="flex flex-col min-h-0 overflow-hidden">
-
-          {/* Result card — lives here so it always has room */}
-          {selected ? (
-            <div
-              className="flex-shrink-0 p-3 border-b border-border animate-in fade-in slide-in-from-top-2 duration-400"
-              data-testid="result-card"
-            >
-              <Card className={`border-2 shadow-sm bg-card overflow-hidden ${isSelectedDone ? 'border-green-500/60' : 'border-primary'}`}>
-                <div className={`py-1 text-center border-b flex items-center justify-center gap-2 ${isSelectedDone ? 'bg-green-50 border-green-200' : 'bg-primary/10 border-primary/20'}`}>
-                  {isSelectedDone
-                    ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /><span className="text-xs font-bold text-green-700 tracking-widest uppercase">Completed</span></>
-                    : <span className="text-xs font-bold text-primary tracking-widest uppercase">Your Mitzvah</span>
-                  }
-                </div>
-                <CardContent className="pt-3 pb-3 px-4">
-                  {/* Name */}
-                  <h2
-                    className="text-base font-bold text-foreground leading-snug"
-                    data-testid="result-display"
-                  >
-                    {selected.name}
-                  </h2>
-
-                  {/* How to do it today */}
-                  {selected.example && (
-                    <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/15 rounded-lg text-left">
-                      <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">How to do it today</p>
-                      <p className="text-xs text-foreground leading-relaxed font-serif">
-                        {selected.example}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Torah source + Done checkbox */}
-                  {(() => {
-                    const src = getMitzvahSource(selected.name);
-                    return (
-                      <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
-                        <div className="flex flex-col gap-0.5">
-                          {src && (
-                            <span className="text-xs text-muted-foreground font-serif">
-                              Parshat <span className="font-semibold text-foreground">{src.parsha}</span>
-                              {" · "}
-                              <span className="font-medium">{src.book} {src.chapter}:{src.verse}</span>
-                            </span>
-                          )}
-                          <a
-                            href={getSefariaUrl(selected.name)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
-                            data-testid="sefaria-link"
-                          >
-                            <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                            {src
-                              ? `Open ${formatVerseRef(src)} on Sefaria`
-                              : "Search on Sefaria"}
-                          </a>
-                        </div>
-
-                    <label
-                      className="flex items-center gap-2 cursor-pointer select-none group"
-                      htmlFor="done-checkbox"
+            {/* Result card */}
+            {selected ? (
+              <div
+                className="flex-shrink-0 p-3 border-b border-border animate-in fade-in slide-in-from-top-2 duration-400"
+                data-testid="result-card"
+              >
+                <Card className={`border-2 shadow-sm bg-card overflow-hidden ${isSelectedDone ? 'border-green-500/60' : 'border-primary'}`}>
+                  <div className={`py-1 text-center border-b flex items-center justify-center gap-2 ${isSelectedDone ? 'bg-green-50 border-green-200' : 'bg-primary/10 border-primary/20'}`}>
+                    {isSelectedDone
+                      ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-600" /><span className="text-xs font-bold text-green-700 tracking-widest uppercase">Completed</span></>
+                      : <span className="text-xs font-bold text-primary tracking-widest uppercase">Your Mitzvah</span>
+                    }
+                  </div>
+                  <CardContent className="pt-3 pb-3 px-4">
+                    <h2
+                      className="text-base font-bold text-foreground leading-snug"
+                      data-testid="result-display"
                     >
-                      <Checkbox
-                        id="done-checkbox"
-                        checked={isSelectedDone}
-                        onCheckedChange={() => toggleCompleted(selected.name)}
-                        className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                        data-testid="done-checkbox"
-                      />
-                      <span className={`text-xs font-medium transition-colors ${isSelectedDone ? 'text-green-700 line-through' : 'text-muted-foreground group-hover:text-foreground'}`}>
-                        {isSelectedDone ? "Done!" : "Mark as done"}
-                      </span>
-                    </label>
+                      {selected.name}
+                    </h2>
+
+                    {selected.example && (
+                      <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/15 rounded-lg text-left">
+                        <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">How to do it today</p>
+                        <p className="text-xs text-foreground leading-relaxed font-serif">
+                          {selected.example}
+                        </p>
                       </div>
-                    );
-                  })()}
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            /* Placeholder when nothing is selected yet */
-            <div className="flex-shrink-0 px-4 py-3 border-b border-border bg-muted/20 text-center">
-              <p className="text-xs text-muted-foreground font-serif italic">
-                Spin the wheel or click any mitzvah below to begin
+                    )}
+
+                    {/* Torah source + checkbox */}
+                    {(() => {
+                      const src = getMitzvahSource(selected.name);
+                      return (
+                        <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
+                          <div className="flex flex-col gap-0.5">
+                            {src && (
+                              <span className="text-xs text-muted-foreground font-serif">
+                                Parshat <span className="font-semibold text-foreground">{src.parsha}</span>
+                                {" · "}
+                                <span className="font-medium">{src.book} {src.chapter}:{src.verse}</span>
+                              </span>
+                            )}
+                            <a
+                              href={getSefariaUrl(selected.name)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+                              data-testid="sefaria-link"
+                            >
+                              <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                              {src
+                                ? `Open ${formatVerseRef(src)} on Sefaria`
+                                : "Search on Sefaria"}
+                            </a>
+                          </div>
+
+                          <label
+                            className="flex items-center gap-2 cursor-pointer select-none group"
+                            htmlFor="done-checkbox"
+                          >
+                            <Checkbox
+                              id="done-checkbox"
+                              checked={isSelectedDone}
+                              onCheckedChange={() => toggleCompleted(selected.name)}
+                              className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                              data-testid="done-checkbox"
+                            />
+                            <span className={`text-xs font-medium transition-colors ${isSelectedDone ? 'text-green-700 line-through' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                              {isSelectedDone ? "Done!" : "Mark as done"}
+                            </span>
+                          </label>
+                        </div>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="flex-shrink-0 px-4 py-3 border-b border-border bg-muted/20 text-center">
+                <p className="text-xs text-muted-foreground font-serif italic">
+                  Spin the wheel or click any mitzvah below to begin
+                </p>
+              </div>
+            )}
+
+            {/* Add mitzvah input */}
+            <div className="flex-shrink-0 px-4 py-2.5 border-b border-border bg-muted/30">
+              <form onSubmit={handleAdd} className="flex gap-2">
+                <Input
+                  placeholder="Add your own mitzvah…"
+                  value={newMitzvah}
+                  onChange={(e) => setNewMitzvah(e.target.value)}
+                  className="flex-1 h-8 text-sm"
+                  data-testid="mitzvah-input"
+                />
+                <Button type="submit" size="sm" className="h-8 px-3 text-sm" disabled={!newMitzvah.trim() || spinning} data-testid="add-mitzvah-button">
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8 flex-shrink-0" onClick={resetToDefaults} disabled={spinning} data-testid="reset-defaults-button" title="Reset to all 613">
+                  <RotateCcw className="w-3 h-3" />
+                </Button>
+              </form>
+              <p className="text-xs text-muted-foreground mt-1">
+                {mitzvahs.length} mitzvot
+                {completedCount > 0 && <span className="ml-2 text-green-600 font-medium">{completedCount} completed</span>}
+                {" — click any to select"}
               </p>
             </div>
-          )}
 
-          {/* Add mitzvah input */}
-          <div className="flex-shrink-0 px-4 py-2.5 border-b border-border bg-muted/30">
-            <form onSubmit={handleAdd} className="flex gap-2">
-              <Input
-                placeholder="Add your own mitzvah…"
-                value={newMitzvah}
-                onChange={(e) => setNewMitzvah(e.target.value)}
-                className="flex-1 h-8 text-sm"
-                data-testid="mitzvah-input"
-              />
-              <Button type="submit" size="sm" className="h-8 px-3 text-sm" disabled={!newMitzvah.trim() || spinning} data-testid="add-mitzvah-button">
-                <Plus className="w-3.5 h-3.5 mr-1" /> Add
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8 flex-shrink-0" onClick={resetToDefaults} disabled={spinning} data-testid="reset-defaults-button" title="Reset to all 613">
-                <RotateCcw className="w-3 h-3" />
-              </Button>
-            </form>
-            <p className="text-xs text-muted-foreground mt-1">
-              {mitzvahs.length} mitzvot
-              {completedCount > 0 && <span className="ml-2 text-green-600 font-medium">{completedCount} completed</span>}
-              {" — click any to select"}
-            </p>
-          </div>
-
-          {/* Scrollable alphabetical accordion */}
-          <ScrollArea className="flex-1 min-h-0" data-testid="mitzvah-list">
-            <div className="p-2">
-              <Accordion type="multiple" className="w-full space-y-1">
-                {letters.map((letter) => {
-                  const letterDoneCount = grouped[letter].filter((m) => completed.has(m)).length;
-                  return (
-                    <AccordionItem
-                      key={letter}
-                      value={letter}
-                      className="border border-border rounded-lg overflow-hidden"
-                    >
-                      <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-primary/5 text-sm font-bold text-primary">
-                        <span className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                            {letter}
-                          </span>
-                          <span className="text-muted-foreground font-normal text-xs">
-                            {grouped[letter].length}
-                          </span>
-                          {letterDoneCount > 0 && (
-                            <span className="flex items-center gap-0.5 text-green-600 text-xs font-medium">
-                              <CheckCircle2 className="w-3 h-3" />{letterDoneCount}
+            {/* Scrollable accordion */}
+            <ScrollArea className="flex-1 min-h-0" data-testid="mitzvah-list">
+              <div className="p-2">
+                <Accordion type="multiple" className="w-full space-y-1">
+                  {letters.map((letter) => {
+                    const letterDoneCount = grouped[letter].filter((m) => completed.has(m)).length;
+                    return (
+                      <AccordionItem
+                        key={letter}
+                        value={letter}
+                        className="border border-border rounded-lg overflow-hidden"
+                      >
+                        <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-primary/5 text-sm font-bold text-primary">
+                          <span className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                              {letter}
                             </span>
-                          )}
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent className="pb-0">
-                        <div className="divide-y divide-border/50">
-                          {grouped[letter].map((m, idx) => {
-                            const originalIdx = mitzvahs.indexOf(m);
-                            const isActive = selected?.name === m;
-                            const isDone = completed.has(m);
-                            return (
-                              <div
-                                key={`${letter}-${idx}`}
-                                className={`group flex items-center px-3 py-1.5 cursor-pointer transition-colors ${
-                                  isActive ? 'bg-primary/10' : isDone ? 'bg-green-50/40' : 'hover:bg-muted/60'
-                                }`}
-                                onClick={() => handleChoose(m)}
-                                data-testid={`mitzvah-item-${originalIdx}`}
-                              >
-                                {isDone
-                                  ? <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0 mr-1.5" />
-                                  : <span className="w-3 mr-1.5 flex-shrink-0" />
-                                }
-                                <span className={`text-xs leading-snug flex-1 ${isActive ? 'font-semibold text-primary' : isDone ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                                  {isActive && <Star className="w-2.5 h-2.5 inline mr-1 fill-primary text-primary" />}
-                                  {m}
-                                </span>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => { e.stopPropagation(); if (originalIdx >= 0) removeMitzvah(originalIdx); }}
-                                  disabled={spinning}
-                                  className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                            <span className="text-muted-foreground font-normal text-xs">
+                              {grouped[letter].length}
+                            </span>
+                            {letterDoneCount > 0 && (
+                              <span className="flex items-center gap-0.5 text-green-600 text-xs font-medium">
+                                <CheckCircle2 className="w-3 h-3" />{letterDoneCount}
+                              </span>
+                            )}
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-0">
+                          <div className="divide-y divide-border/50">
+                            {grouped[letter].map((m, idx) => {
+                              const originalIdx = mitzvahs.indexOf(m);
+                              const isActive = selected?.name === m;
+                              const isDone = completed.has(m);
+                              return (
+                                <div
+                                  key={`${letter}-${idx}`}
+                                  className={`group flex items-center px-3 py-1.5 cursor-pointer transition-colors ${
+                                    isActive ? 'bg-primary/10' : isDone ? 'bg-green-50/40' : 'hover:bg-muted/60'
+                                  }`}
+                                  onClick={() => handleChoose(m)}
+                                  data-testid={`mitzvah-item-${originalIdx}`}
                                 >
-                                  <Trash2 className="h-2.5 w-2.5" />
-                                </Button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                })}
-              </Accordion>
-            </div>
-          </ScrollArea>
+                                  {isDone
+                                    ? <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0 mr-1.5" />
+                                    : <span className="w-3 mr-1.5 flex-shrink-0" />
+                                  }
+                                  <span className={`text-xs leading-snug flex-1 ${isActive ? 'font-semibold text-primary' : isDone ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                                    {isActive && <Star className="w-2.5 h-2.5 inline mr-1 fill-primary text-primary" />}
+                                    {m}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => { e.stopPropagation(); if (originalIdx >= 0) removeMitzvah(originalIdx); }}
+                                    disabled={spinning}
+                                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                                  >
+                                    <Trash2 className="h-2.5 w-2.5" />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
+              </div>
+            </ScrollArea>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
