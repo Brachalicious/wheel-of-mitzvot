@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useMitzvahs } from "@/hooks/use-mitzvahs";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
@@ -8,29 +8,35 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2, Plus, RotateCcw, Star } from "lucide-react";
 
+const WHEEL_SLOT_COUNT = 12;
+
+function pickRandom(arr: string[], n: number): string[] {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(n, arr.length));
+}
+
 export default function Home() {
   const { mitzvahs, isLoaded, addMitzvah, removeMitzvah, resetToDefaults } = useMitzvahs();
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [newMitzvah, setNewMitzvah] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [wheelItems, setWheelItems] = useState<string[] | null>(null);
 
   const handleSpin = () => {
     if (spinning || mitzvahs.length === 0) return;
     setResult(null);
     setShowConfetti(false);
+    const selected = pickRandom(mitzvahs, WHEEL_SLOT_COUNT);
+    setWheelItems(selected);
     setSpinning(true);
   };
 
-  const handleSpinComplete = (winner: string) => {
+  const handleSpinComplete = useCallback((winner: string) => {
     setResult(winner);
     setShowConfetti(true);
-    
-    // Hide confetti after a few seconds
-    setTimeout(() => {
-      setShowConfetti(false);
-    }, 4000);
-  };
+    setTimeout(() => setShowConfetti(false), 4000);
+  }, []);
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,16 +48,14 @@ export default function Home() {
 
   if (!isLoaded) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
+  const displayItems = wheelItems ?? pickRandom(mitzvahs, WHEEL_SLOT_COUNT);
+
   return (
     <div className="min-h-screen pb-12 flex flex-col">
       <Confetti active={showConfetti} />
-      
+
       {/* Header */}
       <header className="w-full py-8 text-center bg-secondary text-secondary-foreground shadow-md relative overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 opacity-10 flex justify-center items-center pointer-events-none">
-           <svg width="200" height="200" viewBox="0 0 100 100" className="star-of-david text-white fill-current"></svg>
-        </div>
         <div className="relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-primary flex items-center justify-center gap-4">
             <Star className="w-8 h-8 md:w-10 md:h-10 fill-primary" />
@@ -65,21 +69,21 @@ export default function Home() {
       </header>
 
       <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        
+
         {/* Left Column: The Wheel */}
         <div className="lg:col-span-7 flex flex-col items-center justify-start space-y-8">
-          
+
           <div className="bg-white/50 p-6 md:p-8 rounded-[2rem] shadow-xl border border-primary/20 w-full max-w-[500px] backdrop-blur-sm">
-            <Wheel 
-              items={mitzvahs} 
-              spinning={spinning} 
-              setSpinning={setSpinning} 
-              onSpinComplete={handleSpinComplete} 
+            <Wheel
+              items={displayItems}
+              spinning={spinning}
+              setSpinning={setSpinning}
+              onSpinComplete={handleSpinComplete}
             />
           </div>
 
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="w-full max-w-[300px] h-16 text-2xl font-bold rounded-full shadow-[0_8px_0_hsl(var(--primary-foreground)),0_15px_20px_rgba(0,0,0,0.3)] transition-all active:translate-y-[8px] active:shadow-[0_0px_0_hsl(var(--primary-foreground)),0_5px_10px_rgba(0,0,0,0.3)] hover:brightness-110"
             onClick={handleSpin}
             disabled={spinning || mitzvahs.length === 0}
@@ -89,7 +93,7 @@ export default function Home() {
           </Button>
 
           {/* Result Display */}
-          <div 
+          <div
             className={`w-full max-w-[500px] transition-all duration-700 transform ${
               result ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
             }`}
@@ -99,11 +103,9 @@ export default function Home() {
                 <span className="text-sm font-bold text-primary tracking-widest uppercase">Your Mitzvah</span>
               </div>
               <CardContent className="pt-8 pb-10 text-center relative">
-                {/* Decorative quotes */}
                 <div className="absolute top-4 left-4 text-4xl text-primary/20 font-serif">"</div>
                 <div className="absolute bottom-4 right-4 text-4xl text-primary/20 font-serif">"</div>
-                
-                <h2 
+                <h2
                   className="text-3xl md:text-4xl font-bold text-foreground leading-tight px-6"
                   data-testid="result-display"
                 >
@@ -113,30 +115,34 @@ export default function Home() {
             </Card>
           </div>
 
+          <p className="text-sm text-muted-foreground text-center max-w-[400px]">
+            Each spin randomly selects {WHEEL_SLOT_COUNT} mitzvot from your full list of {mitzvahs.length}. Every spin is a new opportunity.
+          </p>
         </div>
 
-        {/* Right Column: Editor */}
+        {/* Right Column: Full Mitzvah List */}
         <div className="lg:col-span-5">
-          <Card className="shadow-lg border-muted h-full flex flex-col max-h-[800px]">
+          <Card className="shadow-lg border-muted h-full flex flex-col" style={{ maxHeight: '800px' }}>
             <CardHeader className="bg-muted/50 border-b border-border pb-6">
-              <CardTitle className="text-2xl font-serif text-secondary">Customize Mitzvahs</CardTitle>
+              <CardTitle className="text-2xl font-serif text-secondary">Mitzvah List</CardTitle>
               <CardDescription className="text-base">
-                Add your own meaningful actions to the wheel.
+                {mitzvahs.length} mitzvot in your wheel pool. Add your own below.
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="p-0 flex-1 flex flex-col min-h-0">
+              {/* Add new */}
               <div className="p-6 border-b border-border bg-white">
                 <form onSubmit={handleAdd} className="flex gap-2">
                   <Input
-                    placeholder="Enter a new mitzvah..."
+                    placeholder="Add a mitzvah..."
                     value={newMitzvah}
                     onChange={(e) => setNewMitzvah(e.target.value)}
                     className="flex-1 text-base h-11"
                     data-testid="mitzvah-input"
                   />
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="h-11 px-6 font-semibold"
                     disabled={!newMitzvah.trim() || spinning}
                     data-testid="add-mitzvah-button"
@@ -146,28 +152,29 @@ export default function Home() {
                 </form>
               </div>
 
-              <ScrollArea className="flex-1 p-6" data-testid="mitzvah-list">
-                <div className="space-y-3">
+              {/* Scrollable list */}
+              <ScrollArea className="flex-1 p-4" data-testid="mitzvah-list">
+                <div className="space-y-2">
                   {mitzvahs.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground italic">
-                      No mitzvahs in the list. Add one or reset to defaults.
+                      No mitzvot in the list. Add one or reset to defaults.
                     </div>
                   ) : (
                     mitzvahs.map((m, i) => (
-                      <div 
-                        key={`${i}-${m}`} 
-                        className="group flex items-center justify-between p-3 md:p-4 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors"
+                      <div
+                        key={`${i}-${m}`}
+                        className="group flex items-center justify-between py-2 px-3 rounded-lg border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-colors"
                       >
-                        <span className="font-medium text-foreground pr-4">{m}</span>
+                        <span className="text-sm font-medium text-foreground pr-2 leading-snug">{m}</span>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => removeMitzvah(i)}
                           disabled={spinning}
-                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-shrink-0"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                           title="Remove mitzvah"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     ))
@@ -175,16 +182,17 @@ export default function Home() {
                 </div>
               </ScrollArea>
 
-              <div className="p-6 border-t border-border bg-muted/30">
-                <Button 
-                  variant="outline" 
+              {/* Reset */}
+              <div className="p-4 border-t border-border bg-muted/30">
+                <Button
+                  variant="outline"
                   className="w-full text-secondary hover:text-secondary-foreground hover:bg-secondary transition-colors"
                   onClick={resetToDefaults}
                   disabled={spinning}
                   data-testid="reset-defaults-button"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  Restore Default List
+                  Reset to Default List
                 </Button>
               </div>
             </CardContent>
