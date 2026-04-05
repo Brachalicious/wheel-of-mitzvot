@@ -4,6 +4,7 @@ import { MACHLOKET } from "@/hooks/use-machloket";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
 import { DailyChecklist } from "@/components/DailyChecklist";
+import { OmerCounter } from "@/components/OmerCounter";
 import { ProgressChart } from "@/components/ProgressChart";
 import { GroupTab } from "@/components/GroupTab";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
@@ -179,8 +180,11 @@ export default function Home() {
 
       {/* Tab content */}
       {tab === "daily" && (
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <DailyChecklist />
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <OmerCounter />
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <DailyChecklist />
+          </div>
         </div>
       )}
 

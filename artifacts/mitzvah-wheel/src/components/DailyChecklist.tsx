@@ -1,39 +1,31 @@
 import { useState } from "react";
 import { useDailyChecklist, DailyItem } from "@/hooks/use-daily-checklist";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
-import { useOmer } from "@/hooks/use-omer";
 import { useShmiras } from "@/hooks/use-shmiras-halashon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle2, Circle, Plus, Trash2, RotateCcw, BookOpen, HandMetal, Heart, Coins, Star } from "lucide-react";
+import { CheckCircle2, Circle, Plus, Trash2, RotateCcw, BookOpen, HandMetal, Coins, Star } from "lucide-react";
 
 const CATEGORY_META: Record<DailyItem["category"], { label: string; color: string; Icon: React.ElementType }> = {
-  prayer:    { label: "Prayer",    color: "text-blue-600",   Icon: Star },
-  blessing:  { label: "Blessing",  color: "text-purple-600", Icon: BookOpen },
-  learning:  { label: "Learning",  color: "text-amber-600",  Icon: BookOpen },
-  physical:  { label: "Physical",  color: "text-green-600",  Icon: HandMetal },
-  tzedakah:  { label: "Tzedakah", color: "text-rose-600",   Icon: Coins },
+  prayer:   { label: "Prayer",   color: "text-blue-600",   Icon: Star },
+  blessing: { label: "Blessing", color: "text-purple-600", Icon: BookOpen },
+  learning: { label: "Learning", color: "text-amber-600",  Icon: BookOpen },
+  physical: { label: "Physical", color: "text-green-600",  Icon: HandMetal },
+  tzedakah: { label: "Tzedakah",color: "text-rose-600",   Icon: Coins },
 };
 
 export function DailyChecklist() {
   const { items, done, toggle, addItem, removeItem, resetDay } = useDailyChecklist();
   const hdate = useHebrewDate();
-  const omer = useOmer();
-  const shl = useShmiras();
+  const shl   = useShmiras();
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [showAdd, setShowAdd] = useState(false);
 
-  // Only include the Omer item when we are actually in the Omer period
-  const visibleItems = items.filter((i) => {
-    if (i.id === "count-omer") return omer !== null;
-    return true;
-  });
-
-  const doneCount = visibleItems.filter((i) => done.has(i.id)).length;
-  const total = visibleItems.length;
-  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+  const doneCount = items.filter((i) => done.has(i.id)).length;
+  const total     = items.length;
+  const pct       = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,23 +39,13 @@ export function DailyChecklist() {
 
   /** Returns the effective description for items whose content changes daily */
   function effectiveDescription(item: DailyItem): string {
-    if (item.id === "shmiras-halashon") {
-      return shl.description;
-    }
-    if (item.id === "count-omer" && omer) {
-      return `${omer.hebrewFormula} — ${omer.englishSummary}. Recite after nightfall with a blessing.`;
-    }
+    if (item.id === "shmiras-halashon") return shl.description;
     return item.description;
   }
 
-  /** Returns the effective name (e.g. add Omer day number to the item name) */
+  /** Returns the effective display name */
   function effectiveName(item: DailyItem): string {
-    if (item.id === "count-omer" && omer) {
-      return `Count the Omer — Day ${omer.day}${omer.isLagBaOmer ? " (Lag BaOmer!)" : ""}`;
-    }
-    if (item.id === "shmiras-halashon") {
-      return shl.title;
-    }
+    if (item.id === "shmiras-halashon") return shl.title;
     return item.name;
   }
 
@@ -108,49 +90,15 @@ export function DailyChecklist() {
         </div>
       </div>
 
-      {/* Omer banner — only shown during the Omer period */}
-      {omer && (
-        <div
-          className={`flex-shrink-0 px-4 py-3 border-b border-border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
-            done.has("count-omer")
-              ? "bg-green-50 border-b-green-200"
-              : omer.isLagBaOmer
-                ? "bg-amber-50"
-                : "bg-indigo-50"
-          }`}
-          onClick={() => toggle("count-omer")}
-          data-testid="omer-banner"
-        >
-          <div className="flex-1 min-w-0">
-            <p className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${omer.isLagBaOmer ? "text-amber-700" : "text-indigo-700"}`}>
-              {omer.isLagBaOmer ? "Lag BaOmer — Day 33" : `Sefirat HaOmer — Day ${omer.day} of 49`}
-            </p>
-            <p className="text-sm font-semibold text-foreground font-serif italic">
-              {omer.hebrewFormula}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">{omer.englishSummary} · Count after nightfall with a blessing</p>
-          </div>
-          <div className="flex-shrink-0">
-            {done.has("count-omer")
-              ? <CheckCircle2 className="w-6 h-6 text-green-600" />
-              : <Circle className={`w-6 h-6 ${omer.isLagBaOmer ? "text-amber-400" : "text-indigo-400"}`} />
-            }
-          </div>
-        </div>
-      )}
-
       {/* Checklist items */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-3 space-y-1.5">
-          {visibleItems.map((item) => {
+          {items.map((item) => {
             const isDone = done.has(item.id);
-            const meta = CATEGORY_META[item.category];
-            const name = effectiveName(item);
-            const desc = effectiveDescription(item);
-            const isOmerItem = item.id === "count-omer"; // rendered in banner above, skip here
-            const isShl = item.id === "shmiras-halashon";
-
-            if (isOmerItem) return null; // already shown in the banner above
+            const meta   = CATEGORY_META[item.category];
+            const name   = effectiveName(item);
+            const desc   = effectiveDescription(item);
+            const isShl  = item.id === "shmiras-halashon";
 
             return (
               <div
@@ -212,7 +160,7 @@ export function DailyChecklist() {
             <form onSubmit={handleAdd} className="p-3 border border-primary/30 rounded-lg bg-primary/5 space-y-2">
               <Input
                 autoFocus
-                placeholder="Mitzvah name (e.g. Count the Omer)"
+                placeholder="Mitzvah name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 className="h-8 text-sm"

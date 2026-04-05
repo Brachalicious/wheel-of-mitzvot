@@ -87,12 +87,6 @@ const DEFAULT_DAILY: DailyItem[] = [
     description: "Learn today's daily portion from the Sefer Chafetz Chaim or Sefer Shmirat HaLashon.",
     category: "learning",
   },
-  {
-    id: "count-omer",
-    name: "Count the Omer",
-    description: "Count today's Omer after nightfall with a blessing.",
-    category: "blessing",
-  },
 ];
 
 const ITEMS_KEY = "mitzvah-wheel-daily-items";
