@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef } from "@/hooks/use-mitzvahs";
+import { MACHLOKET } from "@/hooks/use-machloket";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
 import { DailyChecklist } from "@/components/DailyChecklist";
@@ -260,45 +261,71 @@ export default function Home() {
                     {/* Torah source + checkbox */}
                     {(() => {
                       const src = getMitzvahSource(selected.name);
+                      const opinions = MACHLOKET[selected.name] ?? [];
                       return (
-                        <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
-                          <div className="flex flex-col gap-0.5">
-                            {src && (
-                              <span className="text-xs text-muted-foreground font-serif">
-                                Parshat <span className="font-semibold text-foreground">{src.parsha}</span>
-                                {" · "}
-                                <span className="font-medium">{src.book} {src.chapter}:{src.verse}</span>
-                              </span>
-                            )}
-                            <a
-                              href={getSefariaUrl(selected.name)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
-                              data-testid="sefaria-link"
+                        <div className="mt-2 flex flex-col gap-2">
+                          <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div className="flex flex-col gap-0.5">
+                              {src && (
+                                <span className="text-xs text-muted-foreground font-serif">
+                                  Parshat <span className="font-semibold text-foreground">{src.parsha}</span>
+                                  {" · "}
+                                  <span className="font-medium">{src.book} {src.chapter}:{src.verse}</span>
+                                </span>
+                              )}
+                              <a
+                                href={getSefariaUrl(selected.name)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+                                data-testid="sefaria-link"
+                              >
+                                <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                {src
+                                  ? `Open ${formatVerseRef(src)} on Sefaria`
+                                  : "Search on Sefaria"}
+                              </a>
+                            </div>
+
+                            <label
+                              className="flex items-center gap-2 cursor-pointer select-none group"
+                              htmlFor="done-checkbox"
                             >
-                              <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                              {src
-                                ? `Open ${formatVerseRef(src)} on Sefaria`
-                                : "Search on Sefaria"}
-                            </a>
+                              <Checkbox
+                                id="done-checkbox"
+                                checked={isSelectedDone}
+                                onCheckedChange={() => toggleCompleted(selected.name)}
+                                className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                data-testid="done-checkbox"
+                              />
+                              <span className={`text-xs font-medium transition-colors ${isSelectedDone ? 'text-green-700 line-through' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                                {isSelectedDone ? "Done!" : "Mark as done"}
+                              </span>
+                            </label>
                           </div>
 
-                          <label
-                            className="flex items-center gap-2 cursor-pointer select-none group"
-                            htmlFor="done-checkbox"
-                          >
-                            <Checkbox
-                              id="done-checkbox"
-                              checked={isSelectedDone}
-                              onCheckedChange={() => toggleCompleted(selected.name)}
-                              className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                              data-testid="done-checkbox"
-                            />
-                            <span className={`text-xs font-medium transition-colors ${isSelectedDone ? 'text-green-700 line-through' : 'text-muted-foreground group-hover:text-foreground'}`}>
-                              {isSelectedDone ? "Done!" : "Mark as done"}
-                            </span>
-                          </label>
+                          {opinions.length > 0 && (
+                            <Accordion type="single" collapsible className="border border-border rounded-lg overflow-hidden">
+                              <AccordionItem value="opinions" className="border-0">
+                                <AccordionTrigger className="px-3 py-1.5 hover:no-underline hover:bg-muted/40 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                                  Halachic Opinions ({opinions.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="px-0 pb-0">
+                                  <div className="divide-y divide-border">
+                                    {opinions.map((op, i) => (
+                                      <div key={i} className="px-3 py-2 bg-muted/20">
+                                        <p className="text-xs font-bold text-primary mb-0.5">{op.authority}</p>
+                                        <p className="text-xs text-foreground leading-relaxed font-serif">{op.position}</p>
+                                        {op.source && (
+                                          <p className="text-xs text-muted-foreground mt-1 italic">{op.source}</p>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                          )}
                         </div>
                       );
                     })()}
