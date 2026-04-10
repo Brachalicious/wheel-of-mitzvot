@@ -7,6 +7,7 @@ import { DailyChecklist } from "@/components/DailyChecklist";
 import { OmerCounter } from "@/components/OmerCounter";
 import { SoulLevels } from "@/components/SoulLevels";
 import { Reminders } from "@/components/Reminders";
+import { DailyMitzvotList } from "@/components/DailyMitzvotList";
 import { ProgressChart } from "@/components/ProgressChart";
 import { GroupTab } from "@/components/GroupTab";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
@@ -155,7 +156,7 @@ export default function Home() {
       <div className="flex-shrink-0 flex border-b border-border bg-muted/30">
         {(["wheel", "daily", "progress", "group"] as Tab[]).map((t) => {
           const labels: Record<Tab, string> = {
-            wheel: "Wheel", daily: "Daily", progress: "Progress", group: "Group",
+            wheel: "Wheel", daily: "Daily Mitzvot", progress: "Progress", group: "Group",
           };
           const icons: Record<Tab, React.ReactNode> = {
             wheel: <Shuffle className="w-3.5 h-3.5" />,
@@ -185,6 +186,7 @@ export default function Home() {
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="flex flex-col gap-4 p-4">
             <OmerCounter />
+            <DailyMitzvotList />
             <Reminders />
             <SoulLevels />
             <DailyChecklist />
