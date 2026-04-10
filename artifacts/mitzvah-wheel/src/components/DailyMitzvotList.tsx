@@ -1,286 +1,180 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Check } from "lucide-react";
+import { ChevronDown, ChevronUp, Check, ExternalLink } from "lucide-react";
 
-// ── Data ─────────────────────────────────────────────────────────────────────
+// ── Data based on the Chafetz Chaim's Sefer HaMitzvos HaKatzar ───────────────
+// Source: Rabbi Moshe Goldberger, "77 Mitzvos for Today" (Torah.org)
+// https://torah.org/series/mitzvah/
 
 interface DailyMitzvah {
+  num: number | string;
   name: string;
   hebrew?: string;
-  source: string;
   note?: string;
+  applicability?: string; // e.g. "Kohanim only", "Men", "Women", "Married couples"
 }
 
 interface Section {
   id: string;
   title: string;
-  subtitle: string;
   color: string;
   bgColor: string;
   borderColor: string;
   textColor: string;
-  badgeColor: string;
   mitzvot: DailyMitzvah[];
 }
 
 const SECTIONS: Section[] = [
   {
-    id: "everyone",
-    title: "Everyone",
-    subtitle: "Men and Women — every day",
+    id: "basics",
+    title: "The Basics",
     color: "#1d4ed8",
     bgColor: "bg-blue-50",
     borderColor: "border-blue-200",
     textColor: "text-blue-800",
-    badgeColor: "bg-blue-100 text-blue-700 border-blue-200",
     mitzvot: [
-      {
-        name: "Morning Blessings (Birchot HaShachar)",
-        hebrew: "בִּרְכוֹת הַשַּׁחַר",
-        source: "Talmud Berakhot 60b",
-        note: "Recite upon waking: modeh ani, blessings over bodily functions, Torah, etc.",
-      },
-      {
-        name: "Recite Shema — morning (Kriat Shema)",
-        hebrew: "קְרִיאַת שְׁמַע שַׁחֲרִית",
-        source: "Devarim 6:7 · Berakhot 1:1–2",
-        note: "Must be recited before the end of the third halachic hour of the day.",
-      },
-      {
-        name: "Recite Shema — evening",
-        hebrew: "קְרִיאַת שְׁמַע עַרְבִית",
-        source: "Devarim 6:7 · Berakhot 1:1",
-        note: "Recited after nightfall (tzet hakochavim), before midnight.",
-      },
-      {
-        name: "Shacharit — Morning Prayer",
-        hebrew: "תְּפִילַּת שַׁחֲרִית",
-        source: "Talmud Berakhot 26b · Rambam, Tefillah 1:1",
-        note: "Women: obligated in at least one daily prayer; may fulfill with Shacharit.",
-      },
-      {
-        name: "Mincha — Afternoon Prayer",
-        hebrew: "תְּפִילַּת מִנְחָה",
-        source: "Talmud Berakhot 26b",
-        note: "From half an hour after midday until sunset.",
-      },
-      {
-        name: "Torah Study — at least some each day",
-        hebrew: "תַּלְמוּד תּוֹרָה",
-        source: "Devarim 6:7 · Kiddushin 29b · Shulchan Aruch YD 246",
-        note: "A positive commandment for all. Even one verse or one halacha fulfills the minimum.",
-      },
-      {
-        name: "Birkat HaMazon — Grace After Meals",
-        hebrew: "בִּרְכַּת הַמָּזוֹן",
-        source: "Devarim 8:10 · Berakhot 35a",
-        note: "Biblical obligation after eating bread. Rabbinic obligation after other foods.",
-      },
-      {
-        name: "Blessings before and after eating (Brachos)",
-        hebrew: "בְּרָכוֹת עַל אֳכָלִים",
-        source: "Talmud Berakhot 35a · OC 167",
-        note: "Blessing before any food or drink; after-blessing (bracha acharona) as applicable.",
-      },
-      {
-        name: "Love God — Ahavat Hashem",
-        hebrew: "אַהֲבַת ה׳",
-        source: "Devarim 6:5 · Sefer HaMitzvot, Positive #3",
-        note: "Cultivate love for God through reflection, Torah, and acts of lovingkindness.",
-      },
-      {
-        name: "Fear/Awe of God — Yirat Hashem",
-        hebrew: "יִרְאַת ה׳",
-        source: "Devarim 6:13 · Sefer HaMitzvot, Positive #4",
-        note: "Maintain awareness that you stand before God in all actions.",
-      },
-      {
-        name: "Do not take God's name in vain",
-        hebrew: "לֹא תִשָּׂא אֶת שֵׁם ה׳ לַשָּׁוְא",
-        source: "Shemot 20:7",
-        note: "Includes careless oaths, empty blessings, and mentioning God's name unnecessarily.",
-      },
-      {
-        name: "Honor Father and Mother",
-        hebrew: "כַּבֵּד אֶת אָבִיךָ וְאֶת אִמֶּךָ",
-        source: "Shemot 20:12 · Kiddushin 31a–b",
-        note: "Show honor through speech, deference, and care, every day of their lives.",
-      },
-      {
-        name: "Love your neighbor as yourself",
-        hebrew: "וְאָהַבְתָּ לְרֵעֲךָ כָּמוֹךָ",
-        source: "Vayikra 19:18 · Shabbat 31a",
-        note: "Rabbi Akiva: this is the great principle of the Torah.",
-      },
-      {
-        name: "Guard your speech — Shmiras HaLashon",
-        hebrew: "שְׁמִירַת הַלָּשׁוֹן",
-        source: "Vayikra 19:16 · Chofetz Chaim",
-        note: "Do not speak lashon hara, rechilut, or motzi shem ra about any person.",
-      },
-      {
-        name: "Do not hate your brother in your heart",
-        hebrew: "לֹא תִשְׂנָא אֶת אָחִיךָ בִּלְבָבֶךָ",
-        source: "Vayikra 19:17",
-        note: "Harboring unexpressed hatred is itself a Torah prohibition.",
-      },
-      {
-        name: "Do not bear a grudge",
-        hebrew: "לֹא תִטֹּר",
-        source: "Vayikra 19:18",
-        note: "Do not keep score of past wrongs against you.",
-      },
-      {
-        name: "Do not take revenge",
-        hebrew: "לֹא תִקֹּם",
-        source: "Vayikra 19:18",
-        note: "Even verbally, do not act in retaliation for how someone treated you.",
-      },
-      {
-        name: "Mezuzah — kiss/touch when passing",
-        hebrew: "מְזוּזָה",
-        source: "Devarim 6:9 · Menachot 33b",
-        note: "A daily reminder that God's presence guards your home.",
-      },
-      {
-        name: "Give charity — Tzedakah",
-        hebrew: "צְדָקָה",
-        source: "Devarim 15:8 · Shulchan Aruch YD 248",
-        note: "A daily mitzvah obligation; even a small amount each day is praiseworthy.",
-      },
-      {
-        name: "Rebuke your neighbor — Tochacha",
-        hebrew: "תּוֹכֵחָה",
-        source: "Vayikra 19:17",
-        note: "Gently correct someone you see sinning, when it will be received.",
-      },
-      {
-        name: "Walk in God's ways — Imitatio Dei",
-        hebrew: "וְהָלַכְתָּ בִּדְרָכָיו",
-        source: "Devarim 28:9 · Sotah 14a",
-        note: "Be gracious, merciful, compassionate — as God is described in the Torah.",
-      },
+      { num: 1, name: "Belief in Hashem", hebrew: "אֱמוּנָה", note: "Know and believe that God exists, that He created and sustains all existence." },
+      { num: 2, name: "Understanding Hashem's Oneness", hebrew: "יִחוּד ה׳", note: "Internalize that God is completely One — not just numerically one, but uniquely and absolutely singular." },
+      { num: 3, name: "Love of Hashem", hebrew: "אַהֲבַת ה׳", note: "Develop a genuine love for God through Torah study, tefillah, and reflection on His kindness." },
+      { num: 4, name: "Fear of Hashem", hebrew: "יִרְאַת ה׳", note: "Maintain constant awareness that you stand before the King. Not dread — awe and reverence." },
+      { num: 5, name: "Sanctifying Hashem's Name — Kiddush Hashem", hebrew: "קִדּוּשׁ ה׳", note: "Act in ways that cause others to recognize and honor God. Your conduct is a sanctification or desecration of His name." },
+      { num: 6, name: "Emulating Hashem's Ways — Imitatio Dei", hebrew: "וְהָלַכְתָּ בִּדְרָכָיו", note: "Be gracious, compassionate, and patient — as God is described. 'Just as He is merciful, you be merciful' (Shabbat 133b)." },
+      { num: 7, name: "Daily Prayer — Tefillah", hebrew: "תְּפִלָּה", note: "Pray every day. At minimum: one full Amidah daily. Full obligation: Shacharit, Mincha, Maariv." },
     ],
   },
-
   {
-    id: "men",
-    title: "Men",
-    subtitle: "Time-bound positive mitzvot obligatory for men",
-    color: "#1e40af",
-    bgColor: "bg-indigo-50",
-    borderColor: "border-indigo-200",
-    textColor: "text-indigo-800",
-    badgeColor: "bg-indigo-100 text-indigo-700 border-indigo-200",
+    id: "uniform",
+    title: "Uniform and Identification",
+    color: "#0369a1",
+    bgColor: "bg-sky-50",
+    borderColor: "border-sky-200",
+    textColor: "text-sky-800",
     mitzvot: [
-      {
-        name: "Tefillin — head and arm",
-        hebrew: "תְּפִלִּין",
-        source: "Shemot 13:9 · Menachot 34b · OC 25",
-        note: "Worn during Shacharit (not on Shabbat or Yom Tov). Place arm-tefillin first, head-tefillin second.",
-      },
-      {
-        name: "Tzitzit — wear a four-cornered garment",
-        hebrew: "צִיצִית",
-        source: "Bamidbar 15:38–40 · Menachot 41a · OC 8",
-        note: "The mitzvah is to wear tzitzit. Customary to wear a tallit katan throughout the day.",
-      },
-      {
-        name: "Maariv — Evening Prayer",
-        hebrew: "תְּפִילַּת מַעֲרִיב",
-        source: "Talmud Berakhot 26b · OC 235",
-        note: "Technically rabbinic for men; women are generally exempt. Recited after nightfall.",
-      },
-      {
-        name: "Prayer with a minyan (10 men)",
-        hebrew: "תְּפִילָּה בְּצִיבּוּר",
-        source: "Berakhot 6a · SA OC 90:9",
-        note: "A higher level of tefillah. Strong obligation to seek a minyan whenever possible.",
-      },
-      {
-        name: "Sefirat HaOmer — Count the Omer",
-        hebrew: "סְפִירַת הָעֹמֶר",
-        source: "Vayikra 23:15 · Menachot 65b",
-        note: "Biblical for men during the 49 days between Pesach and Shavuot. Women: customary.",
-      },
-      {
-        name: "Kiddush — Shabbat and Yom Tov sanctification",
-        hebrew: "קִדּוּשׁ",
-        source: "Shemot 20:8 · Pesachim 106a",
-        note: "Biblically obligatory for men. Women are also obligated (Rashi); many poskim agree.",
-      },
-      {
-        name: "Full Torah study obligation (three sedarim)",
-        hebrew: "תַּלְמוּד תּוֹרָה — שְׁלֹשָׁה סְדָרִים",
-        source: "Kiddushin 29b · SA YD 246:1",
-        note: "Men must set fixed times morning and night. Goal: divide day into Torah, work, and other.",
-      },
+      { num: 8, name: "Tefillin on the Arm", hebrew: "תְּפִלִּין שֶׁל יָד", note: "Wear arm-tefillin during Shacharit on weekdays. Placed on the left arm opposite the heart.", applicability: "Men" },
+      { num: 9, name: "Tefillin on the Head", hebrew: "תְּפִלִּין שֶׁל רֹאשׁ", note: "Wear head-tefillin during Shacharit on weekdays. Placed above the hairline, centered.", applicability: "Men" },
+      { num: 10, name: "Tzitzit", hebrew: "צִיצִית", note: "Wear a four-cornered garment with tzitzit. The mitzvah is to wear it; the tallit katan fulfills this throughout the day.", applicability: "Men" },
+      { num: 11, name: "Kriat Shema", hebrew: "קְרִיאַת שְׁמַע", note: "Recite Shema morning and evening — declaring God's unity twice daily. The foundation of Jewish faith." },
+      { num: 12, name: "Mezuzah", hebrew: "מְזוּזָה", note: "Affix a mezuzah on the right doorpost of your home and rooms. Touch it when passing as a reminder of God's presence." },
     ],
   },
-
   {
-    id: "women",
-    title: "Women",
-    subtitle: "Mitzvot with specific or heightened obligation for women",
-    color: "#9d174d",
-    bgColor: "bg-rose-50",
-    borderColor: "border-rose-200",
-    textColor: "text-rose-800",
-    badgeColor: "bg-rose-100 text-rose-700 border-rose-200",
+    id: "food",
+    title: "Food-Related Mitzvot",
+    color: "#047857",
+    bgColor: "bg-emerald-50",
+    borderColor: "border-emerald-200",
+    textColor: "text-emerald-800",
     mitzvot: [
-      {
-        name: "Shabbat candle lighting",
-        hebrew: "הַדְלָקַת נֵרוֹת שַׁבָּת",
-        source: "Shabbat 2:6 (Mishnah) · SA OC 263",
-        note: "Primary obligation falls on women. Recite the bracha and light before sunset on Friday.",
-      },
-      {
-        name: "Challah separation (Hafrashat Challah)",
-        hebrew: "הַפְרָשַׁת חַלָּה",
-        source: "Bamidbar 15:20 · SA YD 322",
-        note: "Separate a portion of dough when baking. One of the three primary women's mitzvot.",
-      },
-      {
-        name: "Taharat HaMishpacha — Family Purity",
-        hebrew: "טָהֳרַת הַמִּשְׁפָּחָה",
-        source: "Vayikra 15:19–28 · SA YD 183–200",
-        note: "Observe the laws of niddah and immerse in the mikveh after the proper count.",
-      },
-      {
-        name: "Daily prayer — at least Shacharit",
-        hebrew: "תְּפִילָּה לְנָשִׁים",
-        source: "Rambam, Tefillah 1:1–2 · SA OC 106",
-        note: "Women are obligated in tefillah (Rambam). Opinion: one prayer daily fulfills the obligation.",
-      },
-      {
-        name: "Niddah count — seven clean days",
-        hebrew: "שִׁבְעָה נְקִיִּים",
-        source: "Vayikra 15:28 · SA YD 196",
-        note: "Count seven clean days after menstruation before immersion in the mikveh.",
-      },
-      {
-        name: "Kiddush on Shabbat",
-        hebrew: "קִדּוּשׁ",
-        source: "Shemot 20:8 · Berakhot 20b",
-        note: "Women are obligated in Kiddush (Talmud Berakhot 20b — they observed Shabbat at Sinai too).",
-      },
-      {
-        name: "Avoid melacha on Shabbat",
-        hebrew: "שְׁבִיתָה בְּשַׁבָּת",
-        source: "Shemot 20:10",
-        note: "The 39 prohibited labors apply equally to women. Women have an additional custom of not doing certain tasks post-candle lighting.",
-      },
-      {
-        name: "Teach children Torah and mitzvot",
-        hebrew: "חִנּוּךְ הַבָּנִים",
-        source: "Devarim 6:7 · Kiddushin 29a",
-        note: "Mothers carry the primary duty of Torah transmission in the home (Rashi, Bereishit 18:19).",
-      },
-      {
-        name: "Tzniut — modest conduct",
-        hebrew: "צְנִיעוּת",
-        source: "Michah 6:8 · SA EH 115 · Mishneh Torah, De'ot 5",
-        note: "Not only dress but conduct, speech, and dignified bearing in all settings.",
-      },
+      { num: 13, name: "Birkat HaMazon — Blessings after a Meal", hebrew: "בִּרְכַּת הַמָּזוֹן", note: "Recite Grace after Meals after eating bread. A biblical obligation (Devarim 8:10)." },
+      { num: 14, name: "Eating Kosher", hebrew: "כַּשְׁרוּת", note: "Observe the laws of kashrut in everything you eat and drink. What enters the body affects the soul." },
+      { num: 15, name: "Covering the Blood after Shechitah", hebrew: "כִּסּוּי הַדָּם", note: "Cover the blood of birds and non-domesticated animals after slaughter.", applicability: "When slaughtering" },
+      { num: 16, name: "Sending Away the Mother Bird — Shiluach HaKen", hebrew: "שִׁלּוּחַ הַקֵּן", note: "Before taking eggs or chicks from a nest, send away the mother bird (Devarim 22:6–7).", applicability: "When taking from a nest" },
+    ],
+  },
+  {
+    id: "learning",
+    title: "Learning and Teaching",
+    color: "#6d28d9",
+    bgColor: "bg-violet-50",
+    borderColor: "border-violet-200",
+    textColor: "text-violet-800",
+    mitzvot: [
+      { num: 17, name: "Learning and Teaching Torah", hebrew: "תַּלְמוּד תּוֹרָה", note: "Study Torah every day — even one verse, one halacha. Teach it to others whenever possible. The greatest of all mitzvot." },
+      { num: 18, name: "Writing and Buying Sefarim", hebrew: "כְּתִיבַת סֵפֶר תּוֹרָה", note: "Own Torah books. Originally: write a Sefer Torah. Today: owning sefarim that enable Torah study fulfills this." },
+      { num: 19, name: "Associating with Torah Scholars", hebrew: "הֲדָבְקוּת בַּחֲכָמִים", note: "Seek out Torah scholars and spend time with them. Their example and atmosphere elevate you." },
+      { num: 20, name: "Honoring Sages and the Elderly", hebrew: "הַדְרַת פְּנֵי זָקֵן", note: "Stand before a Torah sage or elderly person. Give them honor and deference (Vayikra 19:32)." },
+      { num: 21, name: "Respecting Holy Places", hebrew: "מוֹרָא מִקְדָּשׁ", note: "Behave with reverence in a shul or beit midrash. Today these are our mikdash me'at — miniature sanctuaries." },
+    ],
+  },
+  {
+    id: "fellow",
+    title: "Mitzvot Relating to our Fellow Man",
+    color: "#b45309",
+    bgColor: "bg-amber-50",
+    borderColor: "border-amber-200",
+    textColor: "text-amber-800",
+    mitzvot: [
+      { num: 22, name: "Loving Every Jew — Ahavat Yisrael", hebrew: "אַהֲבַת יִשְׂרָאֵל", note: "Love every fellow Jew as yourself. Rabbi Akiva: this is the great principle of the Torah (Shabbat 31a)." },
+      { num: 23, name: "Loving Converts — Ahavat Ger", hebrew: "אַהֲבַת הַגֵּר", note: "Show special warmth and love to converts — the Torah commands this 36 times." },
+      { num: 24, name: "Giving Charity — Tzedakah", hebrew: "צְדָקָה", note: "Give tzedakah every day. Even a small amount fulfills the mitzvah. 10% (maaser) is the standard." },
+      { num: 25, name: "Giving Loans", hebrew: "הַלְוָאָה", note: "Lend money to a fellow Jew in need without interest. A higher level than tzedakah according to Rambam." },
+      { num: 26, name: "Returning a Security Daily", hebrew: "הֲשָׁבַת הָעֲבוֹט", note: "Return a poor person's collateral (e.g. a blanket) each evening for their use." },
+      { num: 27, name: "Shemittah — Loan Cancellation", hebrew: "שְׁמִטַּת כְּסָפִים", note: "Cancel loans at the end of the seventh year (Shemittah). Use a Pruzbul to preserve the loan before Shemittah.", applicability: "When applicable" },
+      { num: 28, name: "Keeping One's Word", hebrew: "קִיּוּם הַדָּבָר", note: "Honor your commitments. Your word is sacred — if you say you will do something, do it." },
+      { num: 29, name: "Nullifying a Vow — Hatarat Nedarim", hebrew: "הַתָּרַת נְדָרִים", note: "Vows and oaths are serious. Perform hatarat nedarim (before Rosh Hashanah and throughout the year) to nullify improper ones." },
+      { num: 30, name: "Safety and Prevention — Maakeh", hebrew: "מַעֲקֶה", note: "Build a railing on a roof or staircase. Broadly: remove hazards from your property and life." },
+      { num: 31, name: "Rights and Obligations of an Employee", hebrew: "דִּינֵי שָׂכִיר", note: "Know and fulfill the halachic obligations between employer and employee — both directions." },
+      { num: 32, name: "Timely Payment to Employees", hebrew: "בְּיוֹמוֹ תִתֵּן שְׂכָרוֹ", note: "Pay workers on time — the same day or night they complete their work (Devarim 24:15)." },
+      { num: 33, name: "Laws of Commerce — Emet beMishkal", hebrew: "אֱמֶת בְּמִשְׁקָל", note: "Use accurate weights and measures. Conduct business with complete honesty and fair dealing." },
+      { num: 34, name: "Returning Stolen Items — Hashavat Gezelah", hebrew: "הַשָׁבַת גְּזֵלָה", note: "Return anything taken wrongfully. Includes overcharging, time theft, and subtle forms of dishonest gain." },
+      { num: 35, name: "Returning a Lost Object — Hashavat Aveidah", hebrew: "הַשָׁבַת אֲבֵידָה", note: "Return lost objects to their owner. Actively look for who it belongs to." },
+      { num: "36–37", name: "Helping Unload and Reload — Perikah and Te'inah", hebrew: "פְּרִיקָה וּטְעִינָה", note: "Help a person whose animal has collapsed under its load, and help reload it. Today: help someone whose car broke down." },
+      { num: 38, name: "Giving Rebuke — Tochacha", hebrew: "תּוֹכֵחָה", note: "Gently rebuke someone you see sinning — when they will receive it. Silence makes you complicit." },
+      { num: 39, name: "Remembering Amalek's Attack", hebrew: "זְכִירַת מַה שֶּׁעָשָׂה עֲמָלֵק", note: "Remember that Amalek ambushed the weak and stragglers leaving Egypt. A daily mitzvah of memory and vigilance." },
+      { num: 40, name: "Destroying Amalek", hebrew: "מְחִיַּת עֲמָלֵק", note: "The obligation to eradicate Amalek. Today: destroy the inner Amalek — the doubter and the cynic within.", applicability: "Primarily conceptual today" },
+    ],
+  },
+  {
+    id: "family",
+    title: "Family-Related Mitzvot",
+    color: "#be185d",
+    bgColor: "bg-pink-50",
+    borderColor: "border-pink-200",
+    textColor: "text-pink-800",
+    mitzvot: [
+      { num: 41, name: "Honoring Your Father and Mother — Kibud Av vaEm", hebrew: "כִּבּוּד אָב וָאֵם", note: "Provide for parents' needs, speak of them with honor, do not contradict or embarrass them." },
+      { num: 42, name: "Revering Your Father and Mother — Morah Av vaEm", hebrew: "מוֹרָא אָב וָאֵם", note: "Do not sit in their designated seat, do not interrupt them, stand when they enter the room." },
+      { num: 43, name: "Getting Married and Having Children — Pru uRevu", hebrew: "פְּרוּ וּרְבוּ", note: "Marry and have children. The first mitzvah in the Torah. Build a Jewish home and family." },
+      { num: 44, name: "Performing Kiddushin — Jewish Marriage", hebrew: "קִדּוּשִׁין", note: "Conduct marriage according to halacha with kiddushin and chuppah." },
+      { num: 45, name: "Circumcision — Brit Milah", hebrew: "בְּרִית מִילָה", note: "Circumcise male children on the eighth day. A covenant with God that marks every Jewish male.", applicability: "Fathers / Males" },
+      { num: "46–47", name: "Yibum and Chalitzah", hebrew: "יִבּוּם וַחֲלִיצָה", note: "If a married man dies childless, his brother has a levirate obligation. Today: chalitzah (release ceremony) is performed.", applicability: "When applicable" },
+      { num: 48, name: "Laws of Inheritance", hebrew: "דִּינֵי יְרוּשָׁה", note: "Follow halachic inheritance law. Torah determines the order and distribution of an estate." },
+    ],
+  },
+  {
+    id: "kohanim",
+    title: "Mitzvot Related to Kohanim",
+    color: "#065f46",
+    bgColor: "bg-teal-50",
+    borderColor: "border-teal-200",
+    textColor: "text-teal-800",
+    mitzvot: [
+      { num: 49, name: "Honoring Kohanim", hebrew: "כִּבּוּד כֹּהֵן", note: "Give a Kohein precedence at the Torah reading, at the table, and in other honors.", applicability: "All — toward Kohanim" },
+      { num: "50–51", name: "Giving a Kohein Meat Portions and Wool Shearings", hebrew: "מַתְּנוֹת כְּהוּנָה", note: "Separate portions of slaughtered animals and wool for the Kohein. Today: observed when applicable.", applicability: "When slaughtering / shearing" },
+      { num: 52, name: "Giving a Kohein Firstborn Animals — Bechor Beheimah", hebrew: "בְּכוֹר בְּהֵמָה", note: "The firstborn of kosher animals belongs to the Kohein.", applicability: "Animal owners" },
+      { num: 53, name: "Redemption of a Firstborn Son — Pidyon HaBen", hebrew: "פִּדְיוֹן הַבֵּן", note: "Redeem a firstborn son from a Kohein thirty days after birth for five silver shekalim.", applicability: "Applicable families" },
+      { num: 54, name: "Redemption of a Firstborn Donkey — Pidyon Peter Chamor", hebrew: "פִּדְיוֹן פֶּטֶר חֲמוֹר", note: "Redeem a firstborn donkey by giving a lamb to a Kohein.", applicability: "When applicable" },
+      { num: 55, name: "Breaking a Donkey's Neck — Arifat Chamor", hebrew: "עֲרִיפַת חֲמוֹר", note: "If one does not redeem the firstborn donkey, break its neck. Shows the severity of the redemption obligation.", applicability: "When applicable" },
+      { num: 56, name: "Separating Challah from Dough — Hafrashat Challah", hebrew: "הַפְרָשַׁת חַלָּה", note: "Separate a portion of dough and give it to a Kohein (today: set it aside and burn it). One of the three primary women's mitzvot.", applicability: "When baking" },
+      { num: 57, name: "The Priestly Blessing — Birkat Kohanim", hebrew: "בִּרְכַּת כֹּהֲנִים", note: "Kohanim bless the congregation daily (in Israel) or on Yom Tov (in Diaspora) with the three-part blessing.", applicability: "Kohanim" },
+      { num: 58, name: "Burial of a Kohein's Relatives", hebrew: "טֻמְאַת כֹּהֵן לְקְרוֹבָיו", note: "A Kohein may become tamei to bury his seven closest relatives. He is commanded to do so.", applicability: "Kohanim" },
+    ],
+  },
+  {
+    id: "days",
+    title: "Special Days",
+    color: "#7c3aed",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
+    textColor: "text-purple-800",
+    mitzvot: [
+      { num: 59, name: "Sanctifying Shabbat — Kiddush", hebrew: "קִדּוּשׁ שַׁבָּת", note: "Recite Kiddush over wine on Friday night and Shabbat morning. 'Remember the Shabbat day to sanctify it' (Shemot 20:8)." },
+      { num: 60, name: "Resting on Shabbat — Menucha", hebrew: "שְׁבִיתָה בְּשַׁבָּת", note: "Refrain from the 39 prohibited labors. Shabbat is not merely not-working; it is an active state of holiness and rest." },
+      { num: 61, name: "Rejoicing on Holidays — Simchat Yom Tov", hebrew: "שִׂמְחַת יוֹם טוֹב", note: "Experience genuine joy on each Yom Tov. For men: meat and wine. For women: new clothing and jewelry." },
+      { num: 62, name: "Clearing Away Chametz — Bedikat Chametz", hebrew: "בִּדִיקַת חָמֵץ", note: "Search for and destroy chametz before Pesach. Sell what cannot be destroyed to a non-Jew.", applicability: "Before Pesach" },
+      { num: 63, name: "Eating Matzah on the First Night of Pesach", hebrew: "אֲכִילַת מַצָּה", note: "Eat at least an olive-sized amount of matzah at the Seder. A biblical obligation on the first night.", applicability: "Pesach" },
+      { num: 64, name: "Telling the Story of the Exodus — Sippur Yetziat Mitzrayim", hebrew: "סִפּוּר יְצִיאַת מִצְרַיִם", note: "Retell the Exodus story at the Seder with enthusiasm and in a way that brings it alive. The more, the better.", applicability: "Pesach Seder" },
+      { num: 65, name: "Resting on the First Day of Pesach", hebrew: "שְׁבִיתָה בְּפֶסַח", note: "Refrain from melacha on the first day (and last day) of Pesach, as on Yom Tov.", applicability: "Pesach" },
+      { num: 66, name: "Counting the Omer — Sefirat HaOmer", hebrew: "סְפִירַת הָעֹמֶר", note: "Count the 49 days from the second night of Pesach to Shavuot. Each day and each week. A tool for personal refinement.", applicability: "Men obligated; women customary" },
+      { num: 67, name: "Resting on the Seventh Day of Pesach", hebrew: "שְׁבִיתַת שְׁבִיעִי שֶׁל פֶּסַח", note: "Observe the final day of Pesach as Yom Tov — no melacha, festive meals.", applicability: "Pesach" },
+      { num: 69, name: "Rosh Hashanah — New Year", hebrew: "רֹאשׁ הַשָּׁנָה", note: "Observe Rosh Hashanah as Yom Tov: rest, prayer, and awareness that you stand in judgment before God.", applicability: "Rosh Hashanah" },
+      { num: 70, name: "Listening to the Shofar", hebrew: "שְׁמִיעַת קוֹל שׁוֹפָר", note: "Hear the shofar blown on Rosh Hashanah — 100 blasts. A call to awaken and return.", applicability: "Rosh Hashanah" },
+      { num: 71, name: "Resting on Yom Kippur", hebrew: "שְׁבִיתָה בְּיוֹם כִּפּוּר", note: "Refrain from melacha on Yom Kippur, as on Shabbat.", applicability: "Yom Kippur" },
+      { num: 72, name: "Fasting on Yom Kippur — Inui Nefesh", hebrew: "עִינּוּי נֶפֶשׁ", note: "Afflict yourself on Yom Kippur: no eating, drinking, bathing, anointing, shoes, or marital relations.", applicability: "Yom Kippur" },
+      { num: 73, name: "Repentance — Teshuvah", hebrew: "תְּשׁוּבָה", note: "Return to God whenever you have sinned. Confess verbally (viduy), feel remorse, and commit to change. A mitzvah every day." },
+      { num: 74, name: "Resting on Sukkot — Shevitat Sukkot", hebrew: "שְׁבִיתָה בְּסוּכּוֹת", note: "Observe Sukkot as Yom Tov: no melacha on the first day (and Shemini Atzeret).", applicability: "Sukkot" },
+      { num: 75, name: "Living in the Sukkah", hebrew: "יְשִׁיבָה בַּסֻּכָּה", note: "Dwell in the sukkah for all seven days: eat, drink, and sleep there. 'In sukkot you shall dwell' (Vayikra 23:42).", applicability: "Sukkot" },
+      { num: 76, name: "Taking the Four Species — Arba Minim", hebrew: "נְטִילַת אַרְבַּע מִינִים", note: "Take the lulav, etrog, hadassim, and aravot each day of Sukkot and wave them.", applicability: "Sukkot" },
+      { num: 77, name: "Resting on Shemini Atzeret", hebrew: "שְׁבִיתָה בִּשְׁמִינִי עֲצֶרֶת", note: "Observe Shemini Atzeret/Simchat Torah as Yom Tov. Rejoice with the Torah.", applicability: "Shemini Atzeret" },
     ],
   },
 ];
@@ -288,7 +182,7 @@ const SECTIONS: Section[] = [
 // ── Storage ───────────────────────────────────────────────────────────────────
 
 function storageKey() {
-  return "mitzvah-wheel-daily-mitzvot-" + new Date().toISOString().slice(0, 10);
+  return "mitzvah-wheel-77-mitzvot-" + new Date().toISOString().slice(0, 10);
 }
 
 function loadDone(): Set<string> {
@@ -318,17 +212,13 @@ function MitzvahRow({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div
-      className={`rounded-lg border transition-all ${
-        done ? "border-green-300 bg-green-50" : "border-white/60 bg-white/60"
-      }`}
-    >
-      <div className="flex items-start gap-2 px-3 py-2.5">
+    <div className={`rounded-lg border transition-all ${done ? "border-green-300 bg-green-50" : "border-white/70 bg-white/60"}`}>
+      <div className="flex items-start gap-2.5 px-3 py-2.5">
         {/* Checkbox */}
         <button
           onClick={onToggle}
           className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-            done ? "border-green-500 bg-green-500" : "border-gray-300 bg-white"
+            done ? "border-green-500 bg-green-500" : "border-gray-300 bg-white hover:border-gray-400"
           }`}
           data-testid="daily-mitzvah-check"
         >
@@ -336,8 +226,16 @@ function MitzvahRow({
         </button>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-1">
-            <div>
+          <div className="flex items-start gap-1">
+            {/* Number badge */}
+            <span
+              className="flex-shrink-0 text-[9px] font-black mt-0.5 px-1 py-0.5 rounded"
+              style={{ backgroundColor: `${color}22`, color }}
+            >
+              {mitzvah.num}
+            </span>
+
+            <div className="flex-1 min-w-0">
               <p className={`text-sm font-semibold leading-snug ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>
                 {mitzvah.name}
               </p>
@@ -346,7 +244,13 @@ function MitzvahRow({
                   {mitzvah.hebrew}
                 </p>
               )}
+              {mitzvah.applicability && (
+                <span className="inline-block text-[9px] font-bold uppercase tracking-wide mt-0.5 px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                  {mitzvah.applicability}
+                </span>
+              )}
             </div>
+
             {mitzvah.note && (
               <button
                 onClick={() => setExpanded((v) => !v)}
@@ -360,12 +264,8 @@ function MitzvahRow({
             )}
           </div>
 
-          <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">
-            {mitzvah.source}
-          </p>
-
           {expanded && mitzvah.note && (
-            <p className="text-xs text-foreground mt-1.5 leading-relaxed border-t border-current/10 pt-1.5">
+            <p className="text-xs text-foreground mt-1.5 leading-relaxed border-t border-current/10 pt-1.5 ml-5">
               {mitzvah.note}
             </p>
           )}
@@ -386,10 +286,8 @@ function MitzvahSection({
   done: Set<string>;
   onToggle: (id: string) => void;
 }) {
-  const [open, setOpen] = useState(true);
-  const completedCount = section.mitzvot.filter((m) =>
-    done.has(`${section.id}:${m.name}`)
-  ).length;
+  const [open, setOpen] = useState(false);
+  const completedCount = section.mitzvot.filter((m) => done.has(`${section.id}:${m.num}`)).length;
 
   return (
     <div className={`rounded-xl border ${section.borderColor} ${section.bgColor} overflow-hidden`}>
@@ -398,18 +296,19 @@ function MitzvahSection({
         className="w-full flex items-center justify-between px-4 py-3 hover:brightness-95 transition-all"
       >
         <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: section.color }} />
-          <div className="text-left">
-            <p className={`text-xs font-bold uppercase tracking-widest ${section.textColor}`}>
-              {section.title}
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{section.subtitle}</p>
-          </div>
+          <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: section.color }} />
+          <p className={`text-xs font-bold uppercase tracking-wider ${section.textColor}`}>
+            {section.title}
+          </p>
+          <span className="text-[10px] text-muted-foreground">
+            {section.mitzvot.length} mitzvot
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {completedCount > 0 && (
             <span
-              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${section.badgeColor}`}
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full border"
+              style={{ backgroundColor: `${section.color}18`, color: section.color, borderColor: `${section.color}40` }}
             >
               {completedCount}/{section.mitzvot.length}
             </span>
@@ -422,9 +321,9 @@ function MitzvahSection({
       </button>
 
       {open && (
-        <div className="px-3 pb-3 space-y-2">
+        <div className="px-3 pb-3 space-y-1.5">
           {section.mitzvot.map((m) => {
-            const key = `${section.id}:${m.name}`;
+            const key = `${section.id}:${m.num}`;
             return (
               <MitzvahRow
                 key={key}
@@ -455,31 +354,45 @@ export function DailyMitzvotList() {
     });
   };
 
-  const totalMitzvot  = SECTIONS.reduce((sum, s) => sum + s.mitzvot.length, 0);
-  const totalDone     = done.size;
-  const pct           = Math.round((totalDone / totalMitzvot) * 100);
+  const totalMitzvot = SECTIONS.reduce((sum, s) => sum + s.mitzvot.length, 0);
+  const totalDone    = done.size;
+  const pct          = totalMitzvot > 0 ? Math.round((totalDone / totalMitzvot) * 100) : 0;
 
   return (
     <div className="space-y-3">
-      {/* Header row */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-foreground">
-          Daily Mitzvot
-        </h2>
-        {totalDone > 0 && (
-          <span className="text-xs text-muted-foreground font-medium">
-            {totalDone} of {totalMitzvot} done ({pct}%)
-          </span>
-        )}
+        <div>
+          <h2 className="text-sm font-bold text-foreground">
+            77 Mitzvot Applicable Today
+          </h2>
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Based on the Chafetz Chaim's Sefer HaMitzvos HaKatzar · Rabbi Moshe Goldberger
+          </p>
+        </div>
+        <a
+          href="https://torah.org/series/mitzvah/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 underline underline-offset-2"
+        >
+          <ExternalLink className="w-3 h-3" />
+          Torah.org
+        </a>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress */}
       {totalDone > 0 && (
-        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full bg-green-500 transition-all"
-            style={{ width: `${pct}%` }}
-          />
+        <div className="space-y-1">
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-green-500 transition-all"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground text-right">
+            {totalDone} of {totalMitzvot} marked · {pct}%
+          </p>
         </div>
       )}
 
@@ -489,7 +402,7 @@ export function DailyMitzvotList() {
       ))}
 
       <p className="text-[10px] text-muted-foreground text-center pt-1">
-        Checkboxes reset daily · Tap any mitzvah for notes and source
+        Tap any mitzvah for details · Checkboxes reset daily
       </p>
     </div>
   );
