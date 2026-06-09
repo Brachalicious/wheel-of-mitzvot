@@ -251,7 +251,7 @@ export default function Home() {
                       : <span className="text-xs font-bold text-primary tracking-widest uppercase">Your Mitzvah</span>
                     }
                   </div>
-                  <CardContent className="pt-3 pb-3 px-4">
+                  <CardContent className="pt-3 pb-3 px-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                     <h2
                       className="text-base font-bold text-foreground leading-snug"
                       data-testid="result-display"

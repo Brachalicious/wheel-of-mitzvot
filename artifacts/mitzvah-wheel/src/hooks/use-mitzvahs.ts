@@ -623,6 +623,12 @@ export const DEFAULT_MITZVAHS: string[] = [
 ];
 
 export const MITZVAH_EXAMPLES: Record<string, string> = {
+  "Destroy idolatry wherever found":
+    "Today this mitzvah applies inwardly: identify the 'idols' competing for your ultimate loyalty — status, money, approval, screens, comfort — and actively dethrone them. The Rambam writes that the heart of this mitzvah is refusing to let anything other than God occupy the throne of your life. Practically: choose one habit or distraction that has taken on outsized importance and consciously subordinate it to a Torah value today. Study Devarim 12:2 on Sefaria to read the source in Hebrew and English side by side.",
+  "Burn a city that adopted idol worship":
+    "While the literal law applied only through a Sanhedrin in Temple times, the inner message is urgent today: communities have a responsibility to uproot practices and influences that lead people away from God. In your sphere — your family, shul, or school — speak up when something corrosive has taken hold. A single honest word can begin dismantling an 'idol' that has quietly captured a community.",
+  "Destroy idols and all their accessories":
+    "The Rambam counts this as a separate mitzvah from destroying idolatry generally — it targets the supporting infrastructure of foreign worship. Today: remove from your environment whatever enables your personal 'idols' (e.g. delete an addictive app, unsubscribe from a channel that pulls you toward materialism or cynicism). Devarim 12:3 is the source — open it on Sefaria to see the full context.",
   "Believe in God's existence":
     "Start the day by saying the Modeh Ani — gratitude is the first expression of belief. Take a moment to acknowledge the miracle of waking up.",
   "Love God with all your heart":
@@ -947,6 +953,11 @@ export const MITZVAH_SOURCES: Record<string, MitzvahSource> = {
   "The court shall exile an accidental killer to a city of refuge": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 25 },
   "Give the Levites cities to dwell in": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 2 },
   "Exile an accidental killer to a city of refuge": { parsha: "Masei", book: "Numbers", chapter: 35, verse: 12 },
+
+  // Deuteronomy — Re'eh
+  "Destroy idolatry wherever found": { parsha: "Re'eh", book: "Deuteronomy", chapter: 12, verse: 2 },
+  "Burn a city that adopted idol worship": { parsha: "Re'eh", book: "Deuteronomy", chapter: 13, verse: 17 },
+  "Destroy idols and all their accessories": { parsha: "Re'eh", book: "Deuteronomy", chapter: 12, verse: 3 },
 
   // Deuteronomy — Vaetchanan
   "Accept God's complete unity": { parsha: "Vaetchanan", book: "Deuteronomy", chapter: 6, verse: 4 },
