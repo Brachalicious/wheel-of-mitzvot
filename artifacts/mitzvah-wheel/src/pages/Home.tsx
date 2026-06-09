@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef } from "@/hooks/use-mitzvahs";
+import { useSefaria } from "@/hooks/use-sefaria";
 import { MACHLOKET } from "@/hooks/use-machloket";
 import { Wheel } from "@/components/Wheel";
 import { Confetti } from "@/components/Confetti";
@@ -48,6 +49,8 @@ export default function Home() {
   const [newMitzvah, setNewMitzvah] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
   const [wheelItems, setWheelItems] = useState<string[] | null>(null);
+  const selectedSrc = selected ? getMitzvahSource(selected.name) : null;
+  const sefaria = useSefaria(selectedSrc);
 
   const selectMitzvah = (name: string, withConfetti = false) => {
     setSelected({ name, example: MITZVAH_EXAMPLES[name] ?? null });
@@ -265,6 +268,51 @@ export default function Home() {
                         <p className="text-xs text-foreground leading-relaxed font-serif">
                           {selected.example}
                         </p>
+                      </div>
+                    )}
+
+                    {/* Live Sefaria verse + commentary */}
+                    {selectedSrc && (
+                      <div className="mt-2 rounded-lg border border-border bg-muted/20 overflow-hidden">
+                        {sefaria.loading && (
+                          <div className="px-3 py-2.5 flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                            Loading from Sefaria…
+                          </div>
+                        )}
+                        {sefaria.error && (
+                          <div className="px-3 py-2 text-xs text-muted-foreground italic">{sefaria.error}</div>
+                        )}
+                        {sefaria.verse && (
+                          <div className="divide-y divide-border">
+                            {/* Hebrew */}
+                            <div className="px-3 py-2.5">
+                              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                                {sefaria.verse.heRef}
+                              </p>
+                              <p className="text-sm leading-relaxed font-serif text-right" dir="rtl" lang="he">
+                                {sefaria.verse.he}
+                              </p>
+                            </div>
+                            {/* English */}
+                            <div className="px-3 py-2.5">
+                              <p className="text-xs leading-relaxed text-foreground font-serif italic">
+                                {sefaria.verse.text}
+                              </p>
+                            </div>
+                            {/* Commentary */}
+                            {sefaria.commentary && (
+                              <div className="px-3 py-2.5 bg-primary/5">
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-primary mb-1">
+                                  {sefaria.commentary.author}
+                                </p>
+                                <p className="text-xs leading-relaxed text-foreground font-serif">
+                                  {sefaria.commentary.text}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
