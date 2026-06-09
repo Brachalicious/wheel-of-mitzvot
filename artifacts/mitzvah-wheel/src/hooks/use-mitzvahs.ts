@@ -1009,6 +1009,70 @@ export function getMitzvahSource(mitzvah: string): MitzvahSource | null {
   return MITZVAH_SOURCES[mitzvah] ?? null;
 }
 
+// ── Applicability ─────────────────────────────────────────────────────────────
+// Returns true if this mitzvah is practically actionable for an ordinary Jew today.
+// Returns false for Temple-era, Kohanim-service, Sanhedrin, king-specific, or
+// other mitzvot that require conditions no longer present.
+
+const NON_APPLICABLE_PATTERNS: RegExp[] = [
+  /\bTemple\b/i,
+  /\baltar\b/i,
+  /\bsacrifice\b/i,
+  /\boffering\b/i,
+  /\bincense\b/i,
+  /showbread/i,
+  /ashes from the/i,
+  /\btamid\b/i,
+  /\bnazirite\b/i,
+  /\bSanhedrin\b/i,
+  /\bking shall\b/i,
+  /\bcourt shall\b/i,
+  /blood redeemer/i,
+  /Kohen Gadol/i,
+  /Levites shall serve/i,
+  /Menorah in the/i,
+  /\bYovel\b/i,
+  /\bJubilee\b/i,
+  /hang.*body/i,
+  /execute the/i,
+  /exile.*killer/i,
+  /cities of refuge/i,
+  /hang a blasphemer/i,
+  /bury an executed/i,
+  /Kohanim shall serve in the/i,
+  /Kohen shall wash hands.*before service/i,
+  /Levites.*carrying poles/i,
+  /slaughter.*firstborn/i,
+  /bring.*sin offering/i,
+  /bring.*guilt offering/i,
+  /bring.*peace offering/i,
+  /bring.*meal offering/i,
+  /bring.*burnt offering/i,
+  /bring.*sliding.scale/i,
+  /shall bring an offering/i,
+  /firstborn.*Kohein.*Meat/i,
+  /\bshechitah\b/i,
+  /\bshechit\b/i,
+  /covering the blood/i,
+  /mother bird/i,
+];
+
+// Mitzvot that match patterns above but ARE actionable today
+const APPLICABLE_OVERRIDE = new Set<string>([
+  "Revere the Holy Temple",          // applies to shul as mikdash me'at
+  "The Kohanim shall bless the people (duchening)",
+  "Honor Kohanim",
+  "Observe the laws of the dedication of a house",
+  "Observe the laws of pidyon haben — redeeming the firstborn",
+  "Covering the Blood after Shechitah",
+  "Sending Away the Mother Bird — Shiluach HaKen",
+]);
+
+export function isApplicableToday(mitzvah: string): boolean {
+  if (APPLICABLE_OVERRIDE.has(mitzvah)) return true;
+  return !NON_APPLICABLE_PATTERNS.some((p) => p.test(mitzvah));
+}
+
 export function getSefariaUrl(mitzvah: string): string {
   const s = MITZVAH_SOURCES[mitzvah];
   if (!s) {

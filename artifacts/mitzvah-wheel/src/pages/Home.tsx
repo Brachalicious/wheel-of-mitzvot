@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef } from "@/hooks/use-mitzvahs";
+import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef, isApplicableToday } from "@/hooks/use-mitzvahs";
 import { useSefaria } from "@/hooks/use-sefaria";
 import { MACHLOKET } from "@/hooks/use-machloket";
 import { Wheel } from "@/components/Wheel";
@@ -262,12 +262,33 @@ export default function Home() {
                       {selected.name}
                     </h2>
 
-                    {selected.example && (
-                      <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/15 rounded-lg text-left">
-                        <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">How to do it today</p>
-                        <p className="text-xs text-foreground leading-relaxed font-serif">
-                          {selected.example}
-                        </p>
+                    {isApplicableToday(selected.name) ? (
+                      selected.example && (
+                        <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/15 rounded-lg text-left">
+                          <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">How to do it today</p>
+                          <p className="text-xs text-foreground leading-relaxed font-serif">
+                            {selected.example}
+                          </p>
+                        </div>
+                      )
+                    ) : (
+                      <div className="mt-2 px-3 py-2.5 rounded-lg border border-amber-200 bg-amber-50 text-left">
+                        <div className="flex items-start gap-2">
+                          <span className="text-base leading-none mt-0.5 flex-shrink-0">📖</span>
+                          <div>
+                            <p className="text-xs font-bold text-amber-800 mb-1">Honor through Torah study</p>
+                            <p className="text-xs text-amber-900 leading-relaxed font-serif mb-2">
+                              This mitzvah is not currently applicable — it requires the Temple, the Sanhedrin, or conditions that don't exist today. The Sages teach that studying its laws is itself a fulfillment:
+                            </p>
+                            <p className="text-[11px] font-bold text-amber-700 font-serif mb-0.5" dir="rtl" lang="he">
+                              וְתַלְמוּד תּוֹרָה כְּנֶגֶד כֻּלָּם
+                            </p>
+                            <p className="text-[11px] text-amber-700 italic font-serif">
+                              "Ve'talmud Torah k'neged kulam — And the study of Torah is equal to them all."
+                            </p>
+                            <p className="text-[10px] text-amber-600 mt-1">— Mishnah Peah 1:1</p>
+                          </div>
+                        </div>
                       </div>
                     )}
 
