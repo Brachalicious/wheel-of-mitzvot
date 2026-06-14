@@ -9,6 +9,7 @@ import { OmerCounter } from "@/components/OmerCounter";
 import { SoulLevels } from "@/components/SoulLevels";
 import { Reminders } from "@/components/Reminders";
 import { DailyMitzvotList } from "@/components/DailyMitzvotList";
+import { DailyPrayer } from "@/components/DailyPrayer";
 import { ProgressChart } from "@/components/ProgressChart";
 import { GroupTab } from "@/components/GroupTab";
 import { useHebrewDate } from "@/hooks/use-hebrew-date";
@@ -188,6 +189,7 @@ export default function Home() {
       {tab === "daily" && (
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="flex flex-col gap-4 p-4">
+            <DailyPrayer />
             <OmerCounter />
             <DailyMitzvotList />
             <Reminders />
