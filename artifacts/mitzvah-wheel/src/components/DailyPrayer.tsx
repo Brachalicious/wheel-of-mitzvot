@@ -1,13 +1,32 @@
 import { useState } from "react";
 import { Check, ExternalLink, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
 import { useSiddur } from "@/hooks/use-siddur";
+import {
+  getSiddurText,
+  stripHtml,
+  SIDDUR_SECTIONS,
+  type SiddurSectionKey,
+} from "@/data/siddur";
 
 // ── Siddur text widget ─────────────────────────────────────────────────────────
-// Fetches a single section from the Sefaria Siddur API and renders it inline.
+// English text loads instantly from bundled JSON.
+// Hebrew loads async from Sefaria API.
 
-function SiddurText({ siddurRef, label }: { siddurRef: string; label: string }) {
+function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
   const [visible, setVisible] = useState(false);
-  const { data, loading, error } = useSiddur(visible ? siddurRef : null);
+  const [selectedKey, setSelectedKey] = useState<SiddurSectionKey>(sectionKeys[0]);
+
+  const section = SIDDUR_SECTIONS[selectedKey];
+  const englishLines = getSiddurText(section.path as string[]).map(stripHtml);
+
+  // Hebrew via API — only fetches when the widget is open
+  const { data: apiData, loading: heLoading } = useSiddur(
+    visible ? section.sefariaRef : null
+  );
+
+  const heLines: string[] = apiData
+    ? apiData.lines.map((l) => l.he).filter(Boolean)
+    : [];
 
   return (
     <div className="mt-2">
@@ -16,54 +35,78 @@ function SiddurText({ siddurRef, label }: { siddurRef: string; label: string }) 
         className="flex items-center gap-1.5 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
       >
         <BookOpen className="w-3 h-3" />
-        {visible ? "Hide" : "Show"} {label}
-        <span className="text-[9px] text-muted-foreground font-normal">— live from Sefaria</span>
+        {visible ? "Hide" : "Show"} prayer text
+        <span className="text-[9px] text-muted-foreground font-normal">— Sefaria Siddur Ashkenaz</span>
       </button>
 
       {visible && (
         <div className="mt-1.5 rounded-lg border border-primary/20 bg-primary/5 overflow-hidden">
-          {loading && (
-            <div className="px-3 py-2 flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin flex-shrink-0" />
-              Loading from Sefaria…
-            </div>
-          )}
-          {error && (
-            <div className="px-3 py-2 text-xs text-muted-foreground italic">{error}</div>
-          )}
-          {data && (
-            <div className="divide-y divide-primary/10">
-              {/* Section label */}
-              <div className="px-3 py-1.5 flex items-center justify-between">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-primary/70">{data.ref}</span>
-                <a
-                  href={`https://www.sefaria.org/${encodeURIComponent(data.ref.replace(/ /g, "_"))}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[9px] text-primary flex items-center gap-0.5 hover:text-primary/80"
+          {/* Section selector */}
+          {sectionKeys.length > 1 && (
+            <div className="px-3 pt-2 pb-1 flex gap-1.5 flex-wrap">
+              {sectionKeys.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setSelectedKey(k)}
+                  className={`text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border transition-colors ${
+                    k === selectedKey
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-white/60 text-muted-foreground border-border hover:border-primary/40"
+                  }`}
                 >
-                  <ExternalLink className="w-2.5 h-2.5" />
-                  Sefaria
-                </a>
-              </div>
-              {/* Hebrew lines */}
-              <div className="px-3 py-2.5">
-                {data.lines.map((l, i) => (
-                  <p key={i} className="text-sm font-serif leading-relaxed text-right mb-1.5 last:mb-0" dir="rtl" lang="he">
-                    {l.he}
-                  </p>
-                ))}
-              </div>
-              {/* English lines */}
-              <div className="px-3 py-2.5">
-                {data.lines.map((l, i) => (
-                  <p key={i} className="text-xs font-serif leading-relaxed italic text-foreground mb-1 last:mb-0">
-                    {l.en}
-                  </p>
-                ))}
-              </div>
+                  {SIDDUR_SECTIONS[k].label}
+                </button>
+              ))}
             </div>
           )}
+
+          {/* Header row */}
+          <div className="px-3 py-1.5 flex items-center justify-between border-b border-primary/10">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-primary/70">
+              {section.label}
+            </span>
+            <a
+              href={`https://www.sefaria.org/${section.sefariaRef.replace(/ /g, "_")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[9px] text-primary flex items-center gap-0.5 hover:text-primary/80"
+            >
+              <ExternalLink className="w-2.5 h-2.5" />
+              Sefaria
+            </a>
+          </div>
+
+          {/* Hebrew (from API) */}
+          {heLines.length > 0 && (
+            <div className="px-3 pt-2.5 pb-1.5 border-b border-primary/10 space-y-1">
+              {heLines.map((line, i) => (
+                <p key={i} className="text-sm font-serif leading-relaxed text-right" dir="rtl" lang="he">
+                  {line}
+                </p>
+              ))}
+            </div>
+          )}
+          {heLoading && (
+            <div className="px-3 py-1.5 flex items-center gap-1.5 text-[10px] text-muted-foreground border-b border-primary/10">
+              <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin flex-shrink-0" />
+              Loading Hebrew…
+            </div>
+          )}
+
+          {/* English (from local JSON — instant) */}
+          <div className="px-3 py-2.5">
+            {englishLines.length > 0 ? (
+              englishLines.map((line, i) => (
+                <p key={i} className="text-xs font-serif leading-relaxed italic text-foreground mb-1 last:mb-0">
+                  {line}
+                </p>
+              ))
+            ) : (
+              <p className="text-[10px] text-muted-foreground italic">
+                Full text available on Sefaria ↗
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -81,9 +124,7 @@ interface Prayer {
   duration: string;
   keyPrayers: string[];
   note: string;
-  // Exact Sefaria Siddur Ashkenaz ref for the featured text
-  siddurRef: string;
-  siddurLabel: string;
+  sectionKeys: SiddurSectionKey[];
   sefariaPageUrl: string;
   menOnly?: boolean;
 }
@@ -97,10 +138,10 @@ const PRAYERS: Prayer[] = [
     timeDetail: "Before anything else — before leaving bed, before washing hands",
     duration: "~30 sec",
     keyPrayers: ["26 words of gratitude for the soul returned"],
-    note: "Said before Netilat Yadayim. No mention of God's name, so it's permitted before washing. It sets the entire day's tone — gratitude first.",
-    siddurRef: "Siddur Ashkenaz, Weekday, Shacharit, Preparatory Prayers, Modeh Ani",
-    siddurLabel: "Modeh Ani text",
-    sefariaPageUrl: "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Shacharit,_Preparatory_Prayers,_Modeh_Ani?lang=bi",
+    note: "Said before Netilat Yadayim. No mention of God's name, so it's permitted before washing. Sets the entire day's tone — gratitude first.",
+    sectionKeys: ["morehAni", "adonOlam", "sovereigntyOfHeaven"],
+    sefariaPageUrl:
+      "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Shacharit,_Preparatory_Prayers,_Modeh_Ani?lang=bi",
   },
   {
     id: "shacharit",
@@ -118,10 +159,10 @@ const PRAYERS: Prayer[] = [
       "Torah reading Mon/Thu/Shabbat/Yom Tov",
       "Aleinu and Kaddish",
     ],
-    note: "The cornerstone of the day. The Amidah should be prayed with a minyan when possible — tefillat tzibur carries special weight. Women are obligated in some daily prayer but not in the full time-bound structure.",
-    siddurRef: "Siddur Ashkenaz, Weekday, Shacharit, Pesukei Dezimra, Barukh She'amar",
-    siddurLabel: "Baruch She'amar (opening of Pesukei deZimra)",
-    sefariaPageUrl: "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Shacharit,_Pesukei_Dezimra,_Barukh_She%27amar?lang=bi",
+    note: "The cornerstone of the day. The Amidah should be prayed with a minyan when possible. Women are obligated in some daily prayer but not in the full time-bound structure.",
+    sectionKeys: ["ashrei", "amidahPatriarchs", "amidahHealing", "amidahPeace", "aleinu"],
+    sefariaPageUrl:
+      "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Shacharit,_Pesukei_Dezimra,_Ashrei?lang=bi",
   },
   {
     id: "mincha",
@@ -137,9 +178,9 @@ const PRAYERS: Prayer[] = [
       "Aleinu",
     ],
     note: "Eliyahu HaNavi's prayer at Mincha time (I Kings 18:36) was answered immediately — a sign of its potency. The shortest of the three prayers. Easiest to add into a busy day.",
-    siddurRef: "Siddur Ashkenaz, Weekday, Minchah, Ashrei",
-    siddurLabel: "Ashrei (Psalm 145)",
-    sefariaPageUrl: "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Minchah,_Ashrei?lang=bi",
+    sectionKeys: ["ashrei", "amidahPatriarchs", "amidahPeace", "aleinu"],
+    sefariaPageUrl:
+      "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Minchah,_Ashrei?lang=bi",
   },
   {
     id: "maariv",
@@ -156,9 +197,9 @@ const PRAYERS: Prayer[] = [
       "Kiddush Levana once a month (when moon visible)",
     ],
     note: "Technically voluntary by biblical law but universally accepted as obligatory. On Friday night: Maariv transitions into Shabbat — Kabbalat Shabbat, Lecha Dodi, then Maariv.",
-    siddurRef: "Siddur Ashkenaz, Weekday, Maariv, Blessings of the Shema, Shema",
-    siddurLabel: "Shema (evening)",
-    sefariaPageUrl: "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Maariv,_Blessings_of_the_Shema,_Shema?lang=bi",
+    sectionKeys: ["ahavahRabbah", "amidahPatriarchs", "aleinu", "lechaDodi", "yedidNefesh"],
+    sefariaPageUrl:
+      "https://www.sefaria.org/Siddur_Ashkenaz,_Weekday,_Maariv,_Blessings_of_the_Shema,_Shema?lang=bi",
     menOnly: true,
   },
   {
@@ -174,8 +215,7 @@ const PRAYERS: Prayer[] = [
       "Psalm 91 (Yoshev b'seter) — protection for the night",
     ],
     note: "The Talmud (Berachot 60b) says this prayer protects during the night. At minimum, recite the first paragraph of Shema. Many add Psalm 91 and the Hamapil blessing.",
-    siddurRef: "Siddur Ashkenaz, Weekday, Shacharit, Preparatory Prayers, Netilat Yadayim",
-    siddurLabel: "Hamapil blessing",
+    sectionKeys: ["thirteen", "amidahPeace", "aleinu"],
     sefariaPageUrl: "https://www.sefaria.org/Psalms.91?lang=bi",
   },
 ];
@@ -192,8 +232,7 @@ const MUSAF: Prayer = {
     "Kedushah of Musaf — expanded version on Shabbat",
   ],
   note: "Replaces the additional Temple sacrifice (korban Musaf). Said only on Shabbat, Yom Tov, Rosh Chodesh, and Chol HaMoed.",
-  siddurRef: "Siddur Ashkenaz, Festivals, Rosh Chodesh, Musaf Amidah for Rosh Chodesh, Avot",
-  siddurLabel: "Musaf Amidah opening (Rosh Chodesh)",
+  sectionKeys: ["amidahPatriarchs", "amidahPeace", "kiddush"],
   sefariaPageUrl: "https://www.sefaria.org/search?q=Musaf+Amidah&tab=text",
 };
 
@@ -203,8 +242,10 @@ function storageKey() {
   return "mitzvah-wheel-prayers-" + new Date().toISOString().slice(0, 10);
 }
 function loadDone(): Set<string> {
-  try { const r = localStorage.getItem(storageKey()); return r ? new Set(JSON.parse(r)) : new Set(); }
-  catch { return new Set(); }
+  try {
+    const r = localStorage.getItem(storageKey());
+    return r ? new Set(JSON.parse(r)) : new Set();
+  } catch { return new Set(); }
 }
 function saveDone(s: Set<string>) {
   try { localStorage.setItem(storageKey(), JSON.stringify([...s])); } catch { /* */ }
@@ -212,16 +253,30 @@ function saveDone(s: Set<string>) {
 
 // ── Prayer row ────────────────────────────────────────────────────────────────
 
-function PrayerRow({ prayer, done, onToggle }: { prayer: Prayer; done: boolean; onToggle: () => void }) {
+function PrayerRow({
+  prayer,
+  done,
+  onToggle,
+}: {
+  prayer: Prayer;
+  done: boolean;
+  onToggle: () => void;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={`rounded-xl border transition-all ${done ? "border-green-300 bg-green-50/60" : "border-border bg-card"}`}>
+    <div
+      className={`rounded-xl border transition-all ${
+        done ? "border-green-300 bg-green-50/60" : "border-border bg-card"
+      }`}
+    >
       <div className="flex items-center gap-3 px-4 py-3">
         <button
           onClick={onToggle}
           className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-            done ? "border-green-500 bg-green-500" : "border-gray-300 bg-white hover:border-gray-400"
+            done
+              ? "border-green-500 bg-green-500"
+              : "border-gray-300 bg-white hover:border-gray-400"
           }`}
           data-testid={`prayer-check-${prayer.id}`}
         >
@@ -230,18 +285,29 @@ function PrayerRow({ prayer, done, onToggle }: { prayer: Prayer; done: boolean; 
 
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className={`text-sm font-bold ${done ? "text-green-700 line-through" : "text-foreground"}`}>
+            <span
+              className={`text-sm font-bold ${
+                done ? "text-green-700 line-through" : "text-foreground"
+              }`}
+            >
               {prayer.name}
             </span>
-            <span className="text-xs font-serif text-muted-foreground" dir="rtl" lang="he">
+            <span
+              className="text-xs font-serif text-muted-foreground"
+              dir="rtl"
+              lang="he"
+            >
               {prayer.hebrew}
             </span>
             {prayer.menOnly && (
-              <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">Men</span>
+              <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+                Men
+              </span>
             )}
           </div>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            {prayer.time} · <span className="text-muted-foreground/70">{prayer.duration}</span>
+            {prayer.time} ·{" "}
+            <span className="text-muted-foreground/70">{prayer.duration}</span>
           </p>
         </div>
 
@@ -256,18 +322,29 @@ function PrayerRow({ prayer, done, onToggle }: { prayer: Prayer; done: boolean; 
           >
             <ExternalLink className="w-3 h-3" />
           </a>
-          <button onClick={() => setOpen((v) => !v)} className="text-muted-foreground hover:text-foreground">
-            {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {open ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
         </div>
       </div>
 
       {open && (
         <div className="px-4 pb-3.5 space-y-2.5 border-t border-border/40">
-          <p className="text-[11px] text-muted-foreground pt-2.5 font-serif italic">{prayer.timeDetail}</p>
+          <p className="text-[11px] text-muted-foreground pt-2.5 font-serif italic">
+            {prayer.timeDetail}
+          </p>
 
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary">What's included</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
+              What's included
+            </p>
             <ul className="space-y-0.5">
               {prayer.keyPrayers.map((p, i) => (
                 <li key={i} className="flex items-start gap-1.5 text-xs text-foreground">
@@ -282,8 +359,8 @@ function PrayerRow({ prayer, done, onToggle }: { prayer: Prayer; done: boolean; 
             <p className="text-xs text-foreground leading-relaxed font-serif">{prayer.note}</p>
           </div>
 
-          {/* Live Siddur text from Sefaria */}
-          <SiddurText siddurRef={prayer.siddurRef} label={prayer.siddurLabel} />
+          {/* Live Siddur text — English from local JSON, Hebrew from Sefaria API */}
+          <SiddurText sectionKeys={prayer.sectionKeys} />
         </div>
       )}
     </div>
@@ -313,7 +390,7 @@ export function DailyPrayer() {
         <div>
           <h2 className="text-sm font-bold text-foreground">Daily Prayer — תְּפִלָּה</h2>
           <p className="text-[10px] text-muted-foreground mt-0.5 font-serif">
-            Shacharit · Mincha · Maariv — texts live from Sefaria Siddur
+            Full Siddur Ashkenaz text · Hebrew from Sefaria · English bundled
           </p>
         </div>
         {done3 > 0 && (
@@ -325,13 +402,21 @@ export function DailyPrayer() {
 
       {done3 > 0 && (
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-          <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${(done3 / 3) * 100}%` }} />
+          <div
+            className="h-full bg-green-500 rounded-full transition-all"
+            style={{ width: `${(done3 / 3) * 100}%` }}
+          />
         </div>
       )}
 
       <div className="space-y-2">
         {PRAYERS.map((p) => (
-          <PrayerRow key={p.id} prayer={p} done={done.has(p.id)} onToggle={() => toggle(p.id)} />
+          <PrayerRow
+            key={p.id}
+            prayer={p}
+            done={done.has(p.id)}
+            onToggle={() => toggle(p.id)}
+          />
         ))}
       </div>
 
@@ -343,7 +428,11 @@ export function DailyPrayer() {
       </button>
 
       {showMusaf && (
-        <PrayerRow prayer={MUSAF} done={done.has("musaf")} onToggle={() => toggle("musaf")} />
+        <PrayerRow
+          prayer={MUSAF}
+          done={done.has("musaf")}
+          onToggle={() => toggle("musaf")}
+        />
       )}
 
       <div className="px-3 py-2.5 rounded-lg bg-secondary/40 border border-border text-center space-y-0.5">
