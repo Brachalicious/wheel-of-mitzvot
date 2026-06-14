@@ -216,9 +216,9 @@ export default function Home() {
 
           {/* ── LEFT: Wheel + Spin Button ── */}
           <div className="flex flex-col items-center justify-center p-4 gap-4 min-h-0 border-r border-border">
-            {/* Wheel — shrinks to fit available height, never exceeds container */}
-            <div className="w-full flex-1 min-h-0 flex items-center justify-center overflow-visible pt-6">
-              <div className="w-full" style={{ maxWidth: 'min(100%, 560px)' }}>
+            {/* Wheel — capped so it never crowds the header or tab bar */}
+            <div className="w-full flex items-center justify-center overflow-visible" style={{ height: 'min(44vh, 320px)' }}>
+              <div className="h-full aspect-square" style={{ maxWidth: 'min(100%, 560px)' }}>
                 <Wheel
                   items={displayItems}
                   spinning={spinning}
