@@ -45,7 +45,7 @@ export function ChatBot({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Shalom! I'm your Mitzvah guide — ask me anything about the 613 mitzvot, halacha, prayer, Jewish practice, or spirituality. How can I help you today?",
+      content: "Shalom! I am your MysticMinded³³ Mitzvah guide — ask me anything about the 613 mitzvot, halacha, prayer, Jewish practice, or spirituality. How can I help you today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -117,7 +117,7 @@ export function ChatBot({ onClose }: { onClose: () => void }) {
     globalConvId = null;
     setMessages([{
       role: "assistant",
-      content: "Shalom! I'm your Mitzvah guide — ask me anything about the 613 mitzvot, halacha, prayer, Jewish practice, or spirituality. How can I help you today?",
+      content: "Shalom! I am your MysticMinded³³ Mitzvah guide — ask me anything about the 613 mitzvot, halacha, prayer, Jewish practice, or spirituality. How can I help you today?",
     }]);
     setError(null);
   };
