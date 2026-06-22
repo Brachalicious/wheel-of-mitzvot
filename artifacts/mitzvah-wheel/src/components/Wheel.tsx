@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo.svg';
 
 interface WheelProps {
   items: string[];
@@ -224,7 +224,8 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
           <img
             src={logo}
             alt="MysticMinded33 — open Mitzvah Guide chat"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
+            style={{ background: 'rgba(26,35,126,0.85)' }}
             draggable={false}
           />
         </button>
