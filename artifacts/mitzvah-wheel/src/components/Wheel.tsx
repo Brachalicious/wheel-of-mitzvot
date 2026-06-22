@@ -224,8 +224,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
           <img
             src={logo}
             alt="MysticMinded33 — open Mitzvah Guide chat"
-            className="w-full h-full object-contain"
-            style={{ background: 'rgba(26,35,126,0.85)' }}
+            className="w-full h-full object-cover"
             draggable={false}
           />
         </button>
