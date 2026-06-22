@@ -53,6 +53,84 @@ function buildIndex(node: SiddurNode, path: string[], acc: SearchEntry[]) {
 const SEARCH_INDEX: SearchEntry[] = [];
 buildIndex(SIDDUR, [], SEARCH_INDEX);
 
+// ── Interlinear text display ──────────────────────────────────────────────────
+
+function InterlinearText({
+  heLines,
+  enLines,
+  loading,
+  sefariaRef,
+}: {
+  heLines: string[];
+  enLines: string[];
+  loading: boolean;
+  sefariaRef: string;
+}) {
+  const maxLen = Math.max(heLines.length, enLines.length);
+  const pairs = Array.from({ length: maxLen }, (_, i) => ({
+    he: heLines[i] ?? "",
+    en: enLines[i] ?? "",
+  }));
+
+  return (
+    <div className="rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
+      {/* Header */}
+      <div className="px-3 py-1.5 border-b border-primary/10 flex items-center justify-between">
+        <span className="text-[9px] font-bold uppercase tracking-widest text-primary/70">
+          Interlinear · Hebrew / English
+        </span>
+        <a
+          href={`https://www.sefaria.org/${sefariaRef.replace(/ /g, "_")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[9px] text-primary flex items-center gap-0.5 hover:text-primary/80"
+        >
+          <ExternalLink className="w-2.5 h-2.5" /> Sefaria
+        </a>
+      </div>
+
+      <div className="px-3 py-3 space-y-4">
+        {/* Loading spinner — show while Hebrew is fetching, English already visible */}
+        {loading && enLines.length === 0 && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            Loading…
+          </div>
+        )}
+
+        {pairs.length > 0 ? (
+          pairs.map((pair, i) => (
+            <div key={i} className="space-y-0.5">
+              {/* Hebrew line */}
+              {pair.he ? (
+                <p
+                  className="text-[15px] font-serif leading-loose text-right text-foreground"
+                  dir="rtl"
+                  lang="he"
+                >
+                  {pair.he}
+                </p>
+              ) : loading ? (
+                <div className="h-5 w-full rounded bg-primary/10 animate-pulse mb-1" />
+              ) : null}
+              {/* English line directly below */}
+              {pair.en && (
+                <p className="text-[11px] font-serif leading-relaxed text-muted-foreground italic">
+                  {pair.en}
+                </p>
+              )}
+            </div>
+          ))
+        ) : !loading ? (
+          <p className="text-[10px] text-muted-foreground italic">
+            Full text available on Sefaria ↗
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 // ── Siddur text display ───────────────────────────────────────────────────────
 
 function SiddurLeaf({ path }: { path: string[] }) {
@@ -62,57 +140,12 @@ function SiddurLeaf({ path }: { path: string[] }) {
   const heLines = data?.lines.map((l) => l.he).filter(Boolean) ?? [];
 
   return (
-    <div className="space-y-3">
-      {/* Hebrew */}
-      <div className="rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
-        <div className="px-3 py-1.5 border-b border-primary/10 flex items-center justify-between">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-primary/70">עברית — Hebrew</span>
-          <a
-            href={`https://www.sefaria.org/${sefariaRef.replace(/ /g, "_")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[9px] text-primary flex items-center gap-0.5 hover:text-primary/80"
-          >
-            <ExternalLink className="w-2.5 h-2.5" /> Sefaria
-          </a>
-        </div>
-        <div className="px-3 py-2.5">
-          {loading && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-              Loading Hebrew…
-            </div>
-          )}
-          {heLines.length > 0 ? (
-            heLines.map((line, i) => (
-              <p key={i} className="text-sm font-serif leading-loose mb-1 last:mb-0 text-right" dir="rtl" lang="he">
-                {line}
-              </p>
-            ))
-          ) : !loading ? (
-            <p className="text-[10px] text-muted-foreground italic">
-              Hebrew text available on Sefaria ↗
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      {/* English */}
-      {englishLines.length > 0 && (
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <div className="px-3 py-1.5 border-b border-border/60">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">English Translation</span>
-          </div>
-          <div className="px-3 py-2.5 space-y-2">
-            {englishLines.map((line, i) => (
-              <p key={i} className="text-xs font-serif leading-relaxed italic text-foreground">
-                {line}
-              </p>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    <InterlinearText
+      heLines={heLines}
+      enLines={englishLines}
+      loading={loading}
+      sefariaRef={sefariaRef}
+    />
   );
 }
 

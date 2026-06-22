@@ -17,7 +17,7 @@ function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
   const [selectedKey, setSelectedKey] = useState<SiddurSectionKey>(sectionKeys[0]);
 
   const section = SIDDUR_SECTIONS[selectedKey];
-  const englishLines = getSiddurText(section.path as string[]).map(stripHtml);
+  const englishLines = getSiddurText(section.path as string[]).map(stripHtml).filter(Boolean);
 
   // Hebrew via API — only fetches when the widget is open
   const { data: apiData, loading: heLoading } = useSiddur(
@@ -28,6 +28,13 @@ function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
     ? apiData.lines.map((l) => l.he).filter(Boolean)
     : [];
 
+  // Build interlinear pairs — zip Hebrew and English line-by-line
+  const maxLen = Math.max(heLines.length, englishLines.length);
+  const pairs = Array.from({ length: maxLen }, (_, i) => ({
+    he: heLines[i] ?? "",
+    en: englishLines[i] ?? "",
+  }));
+
   return (
     <div className="mt-2">
       <button
@@ -36,7 +43,7 @@ function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
       >
         <BookOpen className="w-3 h-3" />
         {visible ? "Hide" : "Show"} prayer text
-        <span className="text-[9px] text-muted-foreground font-normal">— Sefaria Siddur Ashkenaz</span>
+        <span className="text-[9px] text-muted-foreground font-normal">— interlinear Hebrew / English</span>
       </button>
 
       {visible && (
@@ -63,7 +70,7 @@ function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
           {/* Header row */}
           <div className="px-3 py-1.5 flex items-center justify-between border-b border-primary/10">
             <span className="text-[9px] font-bold uppercase tracking-widest text-primary/70">
-              {section.label}
+              Interlinear · Hebrew / English
             </span>
             <a
               href={`https://www.sefaria.org/${section.sefariaRef.replace(/ /g, "_")}`}
@@ -76,36 +83,43 @@ function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
             </a>
           </div>
 
-          {/* Hebrew (from API) */}
-          {heLines.length > 0 && (
-            <div className="px-3 pt-2.5 pb-1.5 border-b border-primary/10 space-y-1">
-              {heLines.map((line, i) => (
-                <p key={i} className="text-sm font-serif leading-relaxed text-right" dir="rtl" lang="he">
-                  {line}
-                </p>
-              ))}
-            </div>
-          )}
-          {heLoading && (
-            <div className="px-3 py-1.5 flex items-center gap-1.5 text-[10px] text-muted-foreground border-b border-primary/10">
-              <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin flex-shrink-0" />
-              Loading Hebrew…
-            </div>
-          )}
+          {/* Interlinear body */}
+          <div className="px-3 py-3 space-y-4">
+            {heLoading && englishLines.length === 0 && (
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin flex-shrink-0" />
+                Loading…
+              </div>
+            )}
 
-          {/* English (from local JSON — instant) */}
-          <div className="px-3 py-2.5">
-            {englishLines.length > 0 ? (
-              englishLines.map((line, i) => (
-                <p key={i} className="text-xs font-serif leading-relaxed italic text-foreground mb-1 last:mb-0">
-                  {line}
-                </p>
+            {pairs.length > 0 ? (
+              pairs.map((pair, i) => (
+                <div key={i} className="space-y-0.5">
+                  {/* Hebrew line */}
+                  {pair.he ? (
+                    <p
+                      className="text-[15px] font-serif leading-loose text-right text-foreground"
+                      dir="rtl"
+                      lang="he"
+                    >
+                      {pair.he}
+                    </p>
+                  ) : heLoading ? (
+                    <div className="h-5 w-full rounded bg-primary/10 animate-pulse" />
+                  ) : null}
+                  {/* English directly below */}
+                  {pair.en && (
+                    <p className="text-[11px] font-serif leading-relaxed italic text-muted-foreground">
+                      {pair.en}
+                    </p>
+                  )}
+                </div>
               ))
-            ) : (
+            ) : !heLoading ? (
               <p className="text-[10px] text-muted-foreground italic">
                 Full text available on Sefaria ↗
               </p>
-            )}
+            ) : null}
           </div>
         </div>
       )}
