@@ -112,7 +112,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
     }
 
     // Hub ring only (no star — logo overlaid in HTML)
-    const hubR = Math.max(28, s * 0.11);
+    const hubR = Math.max(40, s * 0.15);
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, hubR, 0, Math.PI * 2);
@@ -181,7 +181,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
   }, [spinning]);
 
   // Hub logo size: 22% of wheel diameter
-  const hubDiameter = size * 0.22;
+  const hubDiameter = size * 0.30;
 
   return (
     <div
@@ -216,7 +216,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
         <button
           onClick={onLogoClick}
           title="Chat with your Mitzvah Guide"
-          className="absolute z-20 rounded-full overflow-hidden border-2 border-yellow-400/80 shadow-xl transition-transform hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="absolute z-20 rounded-full overflow-hidden shadow-xl transition-transform hover:scale-110 active:scale-95 focus:outline-none"
           style={{
             width:  hubDiameter,
             height: hubDiameter,
