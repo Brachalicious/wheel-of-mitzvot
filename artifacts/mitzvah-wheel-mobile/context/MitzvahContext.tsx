@@ -12,6 +12,7 @@ interface MitzvahContextValue {
   isLoaded: boolean;
   addMitzvah: (name: string) => void;
   removeMitzvah: (index: number) => void;
+  moveMitzvah: (fromIndex: number, toIndex: number) => void;
   resetToDefaults: () => void;
 
   completed: Set<string>;
@@ -78,6 +79,17 @@ export function MitzvahProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const moveMitzvah = useCallback((fromIndex: number, toIndex: number) => {
+    setMitzvahs((prev) => {
+      if (toIndex < 0 || toIndex >= prev.length) return prev;
+      const newList = [...prev];
+      const [item] = newList.splice(fromIndex, 1);
+      newList.splice(toIndex, 0, item);
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newList));
+      return newList;
+    });
+  }, []);
+
   const resetToDefaults = useCallback(async () => {
     await save(DEFAULT_MITZVAHS);
   }, [save]);
@@ -99,7 +111,7 @@ export function MitzvahProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <MitzvahContext.Provider value={{
-      mitzvahs, isLoaded, addMitzvah, removeMitzvah, resetToDefaults,
+      mitzvahs, isLoaded, addMitzvah, removeMitzvah, moveMitzvah, resetToDefaults,
       completed, toggleCompleted, clearCompleted,
     }}>
       {children}
