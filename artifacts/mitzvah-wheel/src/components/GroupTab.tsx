@@ -5,7 +5,7 @@ import { useMitzvahs } from "@/hooks/use-mitzvahs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trophy, Copy, Check, Users, Trash2, UserPlus, Share2, Medal } from "lucide-react";
+import { Trophy, Copy, Check, Users, Trash2, UserPlus, Share2, Medal, Sparkles } from "lucide-react";
 
 function medal(rank: number) {
   if (rank === 1) return <Medal className="w-4 h-4 text-yellow-500" />;
@@ -38,7 +38,7 @@ export function GroupTab() {
 
   const handleCopyCode = () => {
     if (!myCode) return;
-    const shareText = `Wheel of Mitzvot — ${myName}: ${myCompleted}/${myTotal} mitzvot completed\nCode: ${myCode}`;
+    const shareText = `Wheel of Mitzvot — ${myName}: ${myCompleted}/${myTotal} mitzvot completed\nMy chavrusah token: ${myCode}`;
     if (navigator.share) {
       navigator.share({ title: "My Mitzvah Progress", text: shareText }).catch(() => {});
     } else {
@@ -53,16 +53,16 @@ export function GroupTab() {
     setImportSuccess("");
     const member = decodeProgress(codeInput.trim());
     if (!member) {
-      setImportError("Invalid code — make sure you copied it exactly.");
+      setImportError("Couldn't read that token — make sure you copied it exactly.");
       return;
     }
     if (member.name === myName) {
-      setImportError("That's your own code!");
+      setImportError("That's your own token!");
       return;
     }
     addMember(member);
     setCodeInput("");
-    setImportSuccess(`Added ${member.name} to your group!`);
+    setImportSuccess(`${member.name} joined your Mitzvah Circle!`);
     setTimeout(() => setImportSuccess(""), 3000);
   };
 
@@ -77,8 +77,8 @@ export function GroupTab() {
       {/* Header */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-border bg-secondary/30">
         <div className="flex items-center gap-2 mb-1">
-          <Users className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-bold text-foreground">Group Challenge</h2>
+          <Sparkles className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Mitzvah Circle</h2>
         </div>
         <p className="text-xs text-muted-foreground font-serif">
           Invite a chavrusah or mitzvah buddy — grow together and inspire each other.
@@ -105,10 +105,10 @@ export function GroupTab() {
             </div>
           </div>
 
-          {/* Share progress */}
+          {/* Your chavrusah token */}
           {myName ? (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-              <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Share Your Progress</p>
+              <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Your Chavrusah Token</p>
               <p className="text-xs text-muted-foreground mb-2 font-serif">
                 Send this to your chavrusah or mitzvah buddy — they paste it to add you to their group.
               </p>
@@ -144,11 +144,11 @@ export function GroupTab() {
               Add a Mitzvah Buddy / Chavrusah
             </p>
             <p className="text-xs text-muted-foreground mb-2 font-serif">
-              Ask a friend, family member, or chavrusah to share their progress with you, then paste it below.
+              Ask a friend, family member, or chavrusah to share their token with you, then paste it below.
             </p>
             <div className="flex gap-2 mb-1">
               <Input
-                placeholder="Paste their progress snapshot here…"
+                placeholder="Paste their token here…"
                 value={codeInput}
                 onChange={(e) => { setCodeInput(e.target.value); setImportError(""); setImportSuccess(""); }}
                 className="h-8 text-sm flex-1 font-mono text-xs"
@@ -161,12 +161,12 @@ export function GroupTab() {
             {importSuccess && <p className="text-xs text-green-600 font-medium mt-1">{importSuccess}</p>}
           </div>
 
-          {/* Leaderboard */}
+          {/* Mitzvah Motivators board */}
           <div className="rounded-lg border border-border bg-card overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
               <div className="flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider">Group Board</span>
+                <span className="text-xs font-bold text-foreground uppercase tracking-wider">Mitzvah Motivators</span>
               </div>
               {members.length > 0 && (
                 <button
@@ -235,7 +235,7 @@ export function GroupTab() {
           </div>
 
           <p className="text-[10px] text-muted-foreground text-center font-serif italic">
-            Everything stays on your device. No account needed — just share your snapshot with your buddies.
+            Everything stays on your device. Tokens are just a snapshot of your progress — no account needed.
           </p>
         </div>
       </ScrollArea>
