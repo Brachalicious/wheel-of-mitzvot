@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import logo from '@/assets/logo.png';
 
 interface WheelProps {
   items: string[];
   onSpinComplete: (item: string) => void;
   spinning: boolean;
   setSpinning: (spinning: boolean) => void;
+  onLogoClick?: () => void;
 }
 
 function getRainbowColor(index: number, total: number): string {
@@ -12,10 +14,11 @@ function getRainbowColor(index: number, total: number): string {
   return `hsl(${hue}, 90%, 52%)`;
 }
 
-export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelProps) {
+export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClick }: WheelProps) {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const wrapperRef  = useRef<HTMLDivElement>(null);
   const [rotation, setRotation] = useState(0);
+  const [size, setSize] = useState(0);
 
   const requestRef      = useRef<number>();
   const velocityRef     = useRef(0);
@@ -26,7 +29,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
   useEffect(() => { itemsRef.current = items; }, [items]);
   useEffect(() => { rotationRef.current = rotation; }, [rotation]);
 
-  // ── Resize canvas to match wrapper, then redraw ──────────────────────────
+  // ── Draw ──────────────────────────────────────────────────────────────────
   const sizeAndDraw = (rot: number) => {
     const canvas  = canvasRef.current;
     const wrapper = wrapperRef.current;
@@ -34,25 +37,26 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const size = wrapper.clientWidth;
-    if (size === 0) return;
+    const s = wrapper.clientWidth;
+    if (s === 0) return;
+    setSize(s);
 
     const dpr = window.devicePixelRatio || 1;
-    canvas.width  = size * dpr;
-    canvas.height = size * dpr;
-    canvas.style.width  = `${size}px`;
-    canvas.style.height = `${size}px`;
+    canvas.width  = s * dpr;
+    canvas.height = s * dpr;
+    canvas.style.width  = `${s}px`;
+    canvas.style.height = `${s}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    drawWheel(ctx, size, rot);
+    drawWheel(ctx, s, rot);
   };
 
-  const drawWheel = (ctx: CanvasRenderingContext2D, size: number, rot: number) => {
-    const cx = size / 2;
-    const cy = size / 2;
-    const radius = size / 2 - 6;
+  const drawWheel = (ctx: CanvasRenderingContext2D, s: number, rot: number) => {
+    const cx = s / 2;
+    const cy = s / 2;
+    const radius = s / 2 - 6;
 
-    ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, s, s);
 
     const numSegments = itemsRef.current.length;
     if (numSegments === 0) return;
@@ -89,7 +93,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
       // Label
       const midAngle = startAngle + arc / 2;
       const label    = itemsRef.current[i];
-      const fontSize = Math.max(8, Math.min(13, size / 55));
+      const fontSize = Math.max(8, Math.min(13, s / 55));
 
       ctx.save();
       ctx.translate(cx, cy);
@@ -107,56 +111,34 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
       ctx.restore();
     }
 
-    // Hub
-    const hubR = Math.max(18, size * 0.065);
+    // Hub ring only (no star — logo overlaid in HTML)
+    const hubR = Math.max(28, s * 0.11);
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, hubR, 0, Math.PI * 2);
-    ctx.fillStyle = '#1a237e';
-    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-    ctx.shadowBlur  = 8;
+    ctx.fillStyle = 'rgba(26, 35, 126, 0.85)';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur  = 12;
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-    ctx.lineWidth   = 2;
+    ctx.strokeStyle = 'rgba(251,191,36,0.9)';
+    ctx.lineWidth   = 2.5;
     ctx.stroke();
-    ctx.restore();
-
-    // Star of David in hub
-    const starSize = hubR * 0.55;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.fillStyle = '#fbbf24';
-    const tri = (flip: boolean) => {
-      ctx.beginPath();
-      ctx.moveTo(0, flip ? starSize : -starSize);
-      ctx.lineTo( starSize * 0.87, flip ? -starSize * 0.5 :  starSize * 0.5);
-      ctx.lineTo(-starSize * 0.87, flip ? -starSize * 0.5 :  starSize * 0.5);
-      ctx.closePath();
-      ctx.fill();
-    };
-    tri(false);
-    tri(true);
     ctx.restore();
   };
 
-  // ── ResizeObserver keeps canvas sharp on any resize ──────────────────────
+  // ── ResizeObserver ─────────────────────────────────────────────────────────
   useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
-
     const ro = new ResizeObserver(() => sizeAndDraw(rotationRef.current));
     ro.observe(wrapper);
     sizeAndDraw(rotationRef.current);
-
     return () => ro.disconnect();
   }, []);
 
-  // ── Redraw whenever items or rotation changes ────────────────────────────
-  useEffect(() => {
-    sizeAndDraw(rotation);
-  }, [items, rotation]);
+  useEffect(() => { sizeAndDraw(rotation); }, [items, rotation]);
 
-  // ── Spin logic ────────────────────────────────────────────────────────────
+  // ── Spin ───────────────────────────────────────────────────────────────────
   const spin = () => {
     if (isSpinningRef.current) return;
     setSpinning(true);
@@ -198,6 +180,9 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
     return () => { if (requestRef.current) cancelAnimationFrame(requestRef.current); };
   }, [spinning]);
 
+  // Hub logo size: 22% of wheel diameter
+  const hubDiameter = size * 0.22;
+
   return (
     <div
       ref={wrapperRef}
@@ -225,6 +210,29 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning }: WheelPro
         ref={canvasRef}
         style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none' }}
       />
+
+      {/* Logo overlay — centred on hub, clickable */}
+      {size > 0 && (
+        <button
+          onClick={onLogoClick}
+          title="Chat with your Mitzvah Guide"
+          className="absolute z-20 rounded-full overflow-hidden border-2 border-yellow-400/80 shadow-xl transition-transform hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          style={{
+            width:  hubDiameter,
+            height: hubDiameter,
+            top:    '50%',
+            left:   '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <img
+            src={logo}
+            alt="MysticMinded33 — open Mitzvah Guide chat"
+            className="w-full h-full object-cover"
+            draggable={false}
+          />
+        </button>
+      )}
     </div>
   );
 }

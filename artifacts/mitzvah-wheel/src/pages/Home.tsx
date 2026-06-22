@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { ChatBot } from "@/components/ChatBot";
 import { useMitzvahs, MITZVAH_EXAMPLES, useCompletedMitzvahs, getSefariaUrl, getMitzvahSource, formatVerseRef, isApplicableToday } from "@/hooks/use-mitzvahs";
 import { useSefaria } from "@/hooks/use-sefaria";
 import { MACHLOKET } from "@/hooks/use-machloket";
@@ -46,6 +47,7 @@ export default function Home() {
   const { completed, toggleCompleted, clearCompleted } = useCompletedMitzvahs();
   const hdate = useHebrewDate();
   const [tab, setTab] = useState<Tab>("wheel");
+  const [chatOpen, setChatOpen] = useState(false);
   const [spinning, setSpinning] = useState(false);
   const [selected, setSelected] = useState<SelectedMitzvah | null>(null);
   const [newMitzvah, setNewMitzvah] = useState("");
@@ -116,6 +118,7 @@ export default function Home() {
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-background">
       <Confetti active={showConfetti} />
+      {chatOpen && <ChatBot onClose={() => setChatOpen(false)} />}
 
       {/* Header */}
       <header className="relative flex-shrink-0 py-2 px-6 bg-secondary shadow-md flex items-center justify-between gap-3">
@@ -240,6 +243,7 @@ export default function Home() {
                   spinning={spinning}
                   setSpinning={setSpinning}
                   onSpinComplete={handleSpinComplete}
+                  onLogoClick={() => setChatOpen(true)}
                 />
               </div>
             </div>
