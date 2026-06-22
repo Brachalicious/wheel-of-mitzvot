@@ -1,0 +1,1 @@
+- [Logo SVG viewBox crop](logo-svg-viewbox.md) — the correct square viewBox to fit all logo content inside a circular clip without cutoff.

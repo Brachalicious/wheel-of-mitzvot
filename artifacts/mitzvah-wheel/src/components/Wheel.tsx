@@ -111,7 +111,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
       ctx.restore();
     }
 
-    // Hub ring only (no star — logo overlaid in HTML)
+    // Hub background circle
     const hubR = Math.max(55, s * 0.22);
     ctx.save();
     ctx.beginPath();
@@ -177,7 +177,10 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
     return () => { if (requestRef.current) cancelAnimationFrame(requestRef.current); };
   }, [spinning]);
 
-  // Hub logo size: 22% of wheel diameter
+  // Hub logo: viewBox "12 -65 480 480" is a square that contains all logo
+  // content (including "MysticMinded33" text) within its inscribed circle.
+  // object-fit: fill stretches the square SVG to exactly fill the square button,
+  // then rounded-full clips it to a circle — nothing is cut off.
   const hubDiameter = size * 0.44;
 
   return (
@@ -218,13 +221,14 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
             width:  hubDiameter,
             height: hubDiameter,
             top:    (size - hubDiameter) / 2,
-            left:   (size - hubDiameter) / 2 - size * 0.025,
+            left:   (size - hubDiameter) / 2,
           }}
         >
           <img
             src={logo}
             alt="MysticMinded33 — open Mitzvah Guide chat"
-            className="w-full h-full object-cover"
+            className="w-full h-full"
+            style={{ objectFit: 'fill' }}
             draggable={false}
           />
         </button>
