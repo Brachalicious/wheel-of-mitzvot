@@ -81,7 +81,7 @@ export function GroupTab() {
           <h2 className="text-sm font-bold text-foreground">Group Challenge</h2>
         </div>
         <p className="text-xs text-muted-foreground font-serif">
-          Share your progress code with friends. Paste theirs to build a leaderboard.
+          Invite a chavrusah or mitzvah buddy — grow together and inspire each other.
         </p>
       </div>
 
@@ -105,12 +105,12 @@ export function GroupTab() {
             </div>
           </div>
 
-          {/* Your progress code */}
+          {/* Share progress */}
           {myName ? (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-              <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Your Progress Code</p>
+              <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Share Your Progress</p>
               <p className="text-xs text-muted-foreground mb-2 font-serif">
-                Share this with your group — they paste it to add you to their leaderboard.
+                Send this to your chavrusah or mitzvah buddy — they paste it to add you to their group.
               </p>
               <div className="flex items-center gap-2 bg-background border border-border rounded px-2 py-1.5 mb-2">
                 <code className="text-[10px] text-foreground flex-1 break-all leading-relaxed select-all">
@@ -127,25 +127,28 @@ export function GroupTab() {
                   ? <><Check className="w-3.5 h-3.5 mr-1.5 text-green-600" /> Copied!</>
                   : navigator.share
                     ? <><Share2 className="w-3.5 h-3.5 mr-1.5" /> Share My Progress</>
-                    : <><Copy className="w-3.5 h-3.5 mr-1.5" /> Copy Code</>
+                    : <><Copy className="w-3.5 h-3.5 mr-1.5" /> Copy &amp; Send to Buddy</>
                 }
               </Button>
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-muted-foreground/30 p-4 text-center">
-              <p className="text-xs text-muted-foreground font-serif italic">Set your name above to generate your shareable code.</p>
+              <p className="text-xs text-muted-foreground font-serif italic">Set your name above to get a shareable progress snapshot.</p>
             </div>
           )}
 
-          {/* Add a friend */}
+          {/* Add a chavrusah / buddy */}
           <div className="rounded-lg border border-border bg-card p-3">
-            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">
-              <UserPlus className="w-3.5 h-3.5 inline mr-1" />
-              Add a Friend
+            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
+              <UserPlus className="w-3.5 h-3.5 inline" />
+              Add a Mitzvah Buddy / Chavrusah
+            </p>
+            <p className="text-xs text-muted-foreground mb-2 font-serif">
+              Ask a friend, family member, or chavrusah to share their progress with you, then paste it below.
             </p>
             <div className="flex gap-2 mb-1">
               <Input
-                placeholder="Paste friend's code here…"
+                placeholder="Paste their progress snapshot here…"
                 value={codeInput}
                 onChange={(e) => { setCodeInput(e.target.value); setImportError(""); setImportSuccess(""); }}
                 className="h-8 text-sm flex-1 font-mono text-xs"
@@ -163,14 +166,14 @@ export function GroupTab() {
             <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
               <div className="flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider">Leaderboard</span>
+                <span className="text-xs font-bold text-foreground uppercase tracking-wider">Group Board</span>
               </div>
               {members.length > 0 && (
                 <button
                   onClick={clearGroup}
                   className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
                 >
-                  Clear friends
+                  Remove all buddies
                 </button>
               )}
             </div>
@@ -178,8 +181,8 @@ export function GroupTab() {
             {leaderboard.length === 0 || (leaderboard.length === 1 && !myName) ? (
               <div className="py-8 text-center text-muted-foreground">
                 <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p className="text-xs font-serif italic">No group members yet.</p>
-                <p className="text-xs mt-1">Set your name and share your code to start competing.</p>
+                <p className="text-xs font-serif italic">No chavrusah added yet.</p>
+                <p className="text-xs mt-1">Set your name and invite a mitzvah buddy to get started.</p>
               </div>
             ) : (
               <div className="divide-y divide-border/50">
@@ -232,7 +235,7 @@ export function GroupTab() {
           </div>
 
           <p className="text-[10px] text-muted-foreground text-center font-serif italic">
-            All data stays on your device. Codes are just your progress snapshot — no account needed.
+            Everything stays on your device. No account needed — just share your snapshot with your buddies.
           </p>
         </div>
       </ScrollArea>
