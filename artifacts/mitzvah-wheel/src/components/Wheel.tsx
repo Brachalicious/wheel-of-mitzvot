@@ -219,7 +219,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
             height: hubDiameter,
             top:    '50%',
             left:   '50%',
-            transform: 'translate(-50%, -50%)',
+            transform: 'translate(-53%, -50%)',
           }}
         >
           <img
