@@ -21,7 +21,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import Svg, { Circle, G, Line, Path, Text as SvgText } from "react-native-svg";
+import Svg, { Circle, ClipPath, Defs, G, Image as SvgImage, Path, Text as SvgText } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -36,11 +36,20 @@ import {
 } from "@/data/mitzvahs";
 import { useColors } from "@/hooks/useColors";
 
-const SEGMENT_COLORS = [
-  "#1A227F", "#F7BF26", "#2335A0", "#E8A800",
-  "#1E2E8A", "#D4A000", "#1A227F", "#F7BF26",
-  "#2335A0", "#E8A800", "#1E2E8A", "#D4A000",
-];
+function getRainbowColor(index: number, total: number): string {
+  const hue = Math.round((index / total) * 360);
+  // Convert HSL to hex for SVG compatibility
+  const h = hue / 360;
+  const s = 0.9;
+  const l = 0.52;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h * 12) % 12;
+    const color = l - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1)));
+    return Math.round(255 * color).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
 
 const WHEEL_SLOTS = 12;
 
@@ -49,23 +58,34 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return shuffled.slice(0, Math.min(n, arr.length));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const logoSrc = require("@/assets/images/logo.png") as number;
+
 function WheelSvg({
   items,
   size,
   winnerIndex,
+  onLogoPress,
 }: {
   items: string[];
   size: number;
   winnerIndex: number | null;
+  onLogoPress?: () => void;
 }) {
   const n = items.length;
   const cx = size / 2;
   const cy = size / 2;
   const r = size / 2 - 4;
-  const innerR = r * 0.22;
+  const hubR = r * 0.18;
 
   return (
     <Svg width={size} height={size}>
+      <Defs>
+        <ClipPath id="logoClip">
+          <Circle cx={cx} cy={cy} r={hubR - 2} />
+        </ClipPath>
+      </Defs>
+
       {items.map((item, i) => {
         const startAngle = (i / n) * 2 * Math.PI - Math.PI / 2;
         const endAngle = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2;
@@ -89,15 +109,15 @@ function WheelSvg({
           <G key={i}>
             <Path
               d={d}
-              fill={isWinner ? "#22c55e" : SEGMENT_COLORS[i % SEGMENT_COLORS.length]}
-              stroke="#FDFAF4"
+              fill={isWinner ? "#22c55e" : getRainbowColor(i, n)}
+              stroke="rgba(255,255,255,0.6)"
               strokeWidth={1.5}
             />
             <SvgText
               x={lx}
               y={ly}
               fontSize={size * 0.028}
-              fill="#FDFAF4"
+              fill="rgba(255,255,255,0.92)"
               textAnchor="middle"
               alignmentBaseline="middle"
               fontWeight="600"
@@ -109,17 +129,21 @@ function WheelSvg({
           </G>
         );
       })}
-      <Circle cx={cx} cy={cy} r={innerR} fill="#1A227F" stroke="#F7BF26" strokeWidth={3} />
-      {[0, 1, 2, 3, 4, 5].map((i) => {
-        const angle = (i / 6) * 2 * Math.PI;
-        const sx = cx + (innerR * 0.5) * Math.cos(angle);
-        const sy = cy + (innerR * 0.5) * Math.sin(angle);
-        const ex = cx + (innerR * 0.9) * Math.cos(angle);
-        const ey = cy + (innerR * 0.9) * Math.sin(angle);
-        return (
-          <Line key={i} x1={sx} y1={sy} x2={ex} y2={ey} stroke="#F7BF26" strokeWidth={1.5} />
-        );
-      })}
+
+      {/* Hub dark ring */}
+      <Circle cx={cx} cy={cy} r={hubR} fill="rgba(26,35,126,0.85)" stroke="#fbbf24" strokeWidth={2.5} />
+
+      {/* Logo image clipped to circle */}
+      <SvgImage
+        x={cx - hubR + 2}
+        y={cy - hubR + 2}
+        width={(hubR - 2) * 2}
+        height={(hubR - 2) * 2}
+        href={logoSrc}
+        clipPath="url(#logoClip)"
+        preserveAspectRatio="xMidYMid slice"
+        onPress={onLogoPress}
+      />
     </Svg>
   );
 }
@@ -336,7 +360,7 @@ export default function WheelScreen() {
   return (
     <View style={[s.container, { paddingTop: topPad }]}>
       <View style={s.header}>
-        <Text style={s.headerTitle}>Wheel of Mitzvot</Text>
+        <Text style={s.headerTitle}>MysticMinded33 Mitzvah Wheel</Text>
         <Text style={s.headerSub}>613 commandments — spin or browse</Text>
       </View>
 
@@ -345,7 +369,7 @@ export default function WheelScreen() {
           <PointerSvg size={wheelSize} />
         </View>
         <Animated.View style={animatedStyle}>
-          <WheelSvg items={wheelItems} size={wheelSize} winnerIndex={spinning ? null : winnerIndex} />
+          <WheelSvg items={wheelItems} size={wheelSize} winnerIndex={spinning ? null : winnerIndex} onLogoPress={() => {}} />
         </Animated.View>
       </View>
 
