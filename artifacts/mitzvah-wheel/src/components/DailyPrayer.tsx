@@ -28,11 +28,17 @@ function SiddurText({ sectionKeys }: { sectionKeys: SiddurSectionKey[] }) {
     ? apiData.lines.map((l) => l.he).filter(Boolean)
     : [];
 
+  // Prefer English from Sefaria API (l.en); fall back to bundled local JSON
+  const apiEnLines: string[] = apiData
+    ? apiData.lines.map((l) => l.en).filter(Boolean)
+    : [];
+  const resolvedEnLines = apiEnLines.length > 0 ? apiEnLines : englishLines;
+
   // Build interlinear pairs — zip Hebrew and English line-by-line
-  const maxLen = Math.max(heLines.length, englishLines.length);
+  const maxLen = Math.max(heLines.length, resolvedEnLines.length);
   const pairs = Array.from({ length: maxLen }, (_, i) => ({
     he: heLines[i] ?? "",
-    en: englishLines[i] ?? "",
+    en: resolvedEnLines[i] ?? "",
   }));
 
   return (

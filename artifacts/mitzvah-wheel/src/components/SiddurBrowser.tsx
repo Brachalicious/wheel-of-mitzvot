@@ -134,15 +134,19 @@ function InterlinearText({
 // ── Siddur text display ───────────────────────────────────────────────────────
 
 function SiddurLeaf({ path }: { path: string[] }) {
-  const englishLines = getSiddurText(path).map(stripHtml).filter(Boolean);
   const sefariaRef = "Siddur Ashkenaz, " + path.join(", ");
   const { data, loading } = useSiddur(sefariaRef);
+
+  // Prefer Sefaria API English (l.en); fall back to bundled local JSON
   const heLines = data?.lines.map((l) => l.he).filter(Boolean) ?? [];
+  const apiEnLines = data?.lines.map((l) => l.en).filter(Boolean) ?? [];
+  const localEnLines = getSiddurText(path).map(stripHtml).filter(Boolean);
+  const enLines = apiEnLines.length > 0 ? apiEnLines : localEnLines;
 
   return (
     <InterlinearText
       heLines={heLines}
-      enLines={englishLines}
+      enLines={enLines}
       loading={loading}
       sefariaRef={sefariaRef}
     />
