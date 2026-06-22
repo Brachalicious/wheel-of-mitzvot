@@ -218,7 +218,7 @@ export function Wheel({ items, onSpinComplete, spinning, setSpinning, onLogoClic
             width:  hubDiameter,
             height: hubDiameter,
             top:    (size - hubDiameter) / 2,
-            left:   (size - hubDiameter) / 2,
+            left:   (size - hubDiameter) / 2 - size * 0.025,
           }}
         >
           <img
