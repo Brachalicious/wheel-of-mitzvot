@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pushes the main branch to github.com/Brachalicious/MysticMinded33_APP.
+# Pushes the main branch to github.com/Brachalicious/wheel-of-mitzvot.
 # Uses GITHUB_TOKEN from the environment — never stored in .git/config.
 # GitHub is a one-way mirror of Replit.
 set -euo pipefail
@@ -21,7 +21,7 @@ fi
 git config user.email "replit-agent@replit.com"
 git config user.name "Replit Agent"
 
-REMOTE_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/Brachalicious/MysticMinded33_APP.git"
+REMOTE_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/Brachalicious/wheel-of-mitzvot.git"
 
 # Push directly via URL — tokenized URL is never written to .git/config.
 # Capture git output and mask the token before printing.
