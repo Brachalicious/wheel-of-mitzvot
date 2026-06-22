@@ -7,7 +7,7 @@ import { Confetti } from "@/components/Confetti";
 import { DailyChecklist } from "@/components/DailyChecklist";
 import { OmerCounter } from "@/components/OmerCounter";
 import { SoulLevels } from "@/components/SoulLevels";
-import { Reminders } from "@/components/Reminders";
+import { RemindersTab } from "@/components/RemindersTab";
 import { DailyMitzvotList } from "@/components/DailyMitzvotList";
 import { DailyPrayer } from "@/components/DailyPrayer";
 import { ProgressChart } from "@/components/ProgressChart";
@@ -24,12 +24,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2, Users, BookOpen } from "lucide-react";
+import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2, Users, BookOpen, Bell } from "lucide-react";
 import { SiddurBrowser } from "@/components/SiddurBrowser";
 
 const WHEEL_SLOT_COUNT = 48;
 
-type Tab = "wheel" | "daily" | "siddur" | "progress" | "group";
+type Tab = "wheel" | "daily" | "siddur" | "progress" | "group" | "reminders";
 
 function pickRandom(arr: string[], n: number): string[] {
   const shuffled = [...arr].sort(() => Math.random() - 0.5);
@@ -159,14 +159,15 @@ export default function Home() {
 
       {/* Tab bar */}
       <div className="flex-shrink-0 flex border-b border-border bg-muted/30 overflow-x-auto">
-        {(["wheel", "daily", "siddur", "progress", "group"] as Tab[]).map((t) => {
+        {(["wheel", "daily", "siddur", "reminders", "progress", "group"] as Tab[]).map((t) => {
           const labels: Record<Tab, string> = {
-            wheel: "Wheel", daily: "Daily", siddur: "Siddur", progress: "Progress", group: "Group",
+            wheel: "Wheel", daily: "Daily", siddur: "Siddur", reminders: "Reminders", progress: "Progress", group: "Group",
           };
           const icons: Record<Tab, React.ReactNode> = {
             wheel: <Shuffle className="w-3.5 h-3.5" />,
             daily: <ListChecks className="w-3.5 h-3.5" />,
             siddur: <BookOpen className="w-3.5 h-3.5" />,
+            reminders: <Bell className="w-3.5 h-3.5" />,
             progress: <BarChart2 className="w-3.5 h-3.5" />,
             group: <Users className="w-3.5 h-3.5" />,
           };
@@ -202,10 +203,15 @@ export default function Home() {
             <DailyPrayer />
             <OmerCounter />
             <DailyMitzvotList />
-            <Reminders />
             <SoulLevels />
             <DailyChecklist />
           </div>
+        </div>
+      )}
+
+      {tab === "reminders" && (
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <RemindersTab />
         </div>
       )}
 
