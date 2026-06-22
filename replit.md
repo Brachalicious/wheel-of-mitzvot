@@ -25,3 +25,24 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Rotating the GitHub token
+
+The GitHub sync (`scripts/sync-to-github.sh`) authenticates with a personal access token stored as the `GITHUB_TOKEN` secret in Replit Secrets. PATs expire and can be revoked, so here is how to replace one quickly.
+
+### Required token scopes
+
+**Fine-grained PAT (recommended)** — scope it to only the `MysticMinded33_APP` / `wheel-of-mitzvot` repository:
+- **Repository access**: only `Brachalicious/wheel-of-mitzvot`
+- **Permissions → Contents**: Read and write
+
+**Classic PAT (fallback)** — grant only the `repo` scope (full control of private repositories). No other scopes are needed.
+
+### Steps to rotate
+
+1. Go to [github.com → Settings → Developer settings → Personal access tokens](https://github.com/settings/tokens) and generate a new token with the scopes above.
+2. Copy the token value immediately (GitHub only shows it once).
+3. Open your Replit project, go to **Tools → Secrets** (or the padlock icon in the sidebar).
+4. Find the secret named `GITHUB_TOKEN` and update its value to the new token.
+5. The next merge will pick up the new token automatically — no code changes required.
+6. Revoke the old token in GitHub once you have confirmed the sync is working.
