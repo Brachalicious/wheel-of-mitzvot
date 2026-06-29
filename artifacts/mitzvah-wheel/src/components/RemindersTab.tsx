@@ -6,6 +6,7 @@ import {
   Link, DollarSign, TrendingUp, Heart,
 } from "lucide-react";
 import { useReminders, playAlarmSound, type Reminder } from "@/hooks/use-reminders";
+import { CandleLighting } from "@/components/CandleLighting";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -843,6 +844,9 @@ export function RemindersTab() {
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
       <div className="p-4 space-y-4 max-w-2xl mx-auto">
+
+        {/* Candle lighting times */}
+        <CandleLighting />
 
         {/* Profile */}
         <div className="rounded-xl border border-border bg-card px-4 py-3 flex items-center gap-3">

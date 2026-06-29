@@ -27,6 +27,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2, Users, BookOpen, Bell } from "lucide-react";
 import { SiddurBrowser } from "@/components/SiddurBrowser";
+import { CandleLightingBadge } from "@/components/CandleLighting";
 
 const WHEEL_SLOT_COUNT = 48;
 
@@ -122,12 +123,13 @@ export default function Home() {
 
       {/* Header */}
       <header className="relative flex-shrink-0 py-2 px-6 bg-secondary shadow-md flex items-center justify-between gap-3">
-        {/* Hebrew date — left */}
-        <div className="flex-1 hidden sm:block">
+        {/* Hebrew date + candle lighting — left */}
+        <div className="flex-1 hidden sm:block space-y-0.5">
           <p className={`text-xs font-bold ${hdate.isShabbat ? "text-purple-400" : "text-primary/70"}`}>
             {hdate.dayOfWeek}
           </p>
           <p className="text-xs text-secondary-foreground/80 font-serif">{hdate.formatted}</p>
+          <CandleLightingBadge />
         </div>
 
         {/* Center title */}
