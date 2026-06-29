@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
+import { useLocalSearchParams } from "expo-router";
 import { Linking } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -186,6 +187,7 @@ export default function WheelScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { mitzvahs, completed, toggleCompleted } = useMitzvahContext();
+  const params = useLocalSearchParams<{ highlight?: string }>();
 
   const [wheelItems, setWheelItems] = useState<string[]>(() => pickRandom(DEFAULT_MITZVAHS, WHEEL_SLOTS));
   const [spinning, setSpinning] = useState(false);
@@ -200,6 +202,24 @@ export default function WheelScreen() {
   useEffect(() => {
     wheelItemsRef.current = wheelItems;
   }, [wheelItems]);
+
+  const highlightParam = params.highlight;
+  useEffect(() => {
+    if (highlightParam && !spinning) {
+      setShowList(false);
+      setSelected(highlightParam);
+      setVerse(null);
+      const src = getMitzvahSource(highlightParam);
+      if (src) {
+        setVerseLoading(true);
+        fetchSefaria(`${src.book} ${src.chapter}:${src.verse}`).then((data) => {
+          setVerse(data);
+          setVerseLoading(false);
+        });
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightParam]);
 
   const rotation = useSharedValue(0);
 

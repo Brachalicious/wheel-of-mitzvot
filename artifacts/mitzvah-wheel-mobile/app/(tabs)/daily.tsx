@@ -5,6 +5,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -14,6 +15,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useColors } from "@/hooks/useColors";
+import {
+  cancelDailyNotification,
+  loadNotificationPrefs,
+  requestNotificationPermission,
+  saveNotificationPrefs,
+  scheduleDailyNotification,
+} from "@/hooks/useNotifications";
 
 const TODAY_KEY = () => {
   const d = new Date();
@@ -72,6 +80,10 @@ export default function DailyScreen() {
   const [tasks, setTasks] = useState<Array<{ id: string; text: string; done: boolean }>>([]);
   const [newTask, setNewTask] = useState("");
 
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifHour, setNotifHour] = useState(8);
+  const [notifMinute, setNotifMinute] = useState(0);
+
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom + 60;
 
@@ -82,6 +94,53 @@ export default function DailyScreen() {
       if (tasksRaw) setTasks(JSON.parse(tasksRaw));
     });
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    loadNotificationPrefs().then((prefs) => {
+      setNotifEnabled(prefs.enabled);
+      setNotifHour(prefs.hour);
+      setNotifMinute(prefs.minute);
+    });
+  }, []);
+
+  const handleNotifToggle = useCallback(async (value: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setNotifEnabled(value);
+    const prefs = { enabled: value, hour: notifHour, minute: notifMinute };
+    await saveNotificationPrefs(prefs);
+    if (value) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        await scheduleDailyNotification(notifHour, notifMinute);
+      } else {
+        setNotifEnabled(false);
+        await saveNotificationPrefs({ ...prefs, enabled: false });
+      }
+    } else {
+      await cancelDailyNotification();
+    }
+  }, [notifHour, notifMinute]);
+
+  const adjustHour = useCallback(async (delta: number) => {
+    const newHour = (notifHour + delta + 24) % 24;
+    setNotifHour(newHour);
+    const prefs = { enabled: notifEnabled, hour: newHour, minute: notifMinute };
+    await saveNotificationPrefs(prefs);
+    if (notifEnabled) {
+      await scheduleDailyNotification(newHour, notifMinute);
+    }
+  }, [notifHour, notifMinute, notifEnabled]);
+
+  const adjustMinute = useCallback(async (delta: number) => {
+    const newMinute = (notifMinute + delta + 60) % 60;
+    setNotifMinute(newMinute);
+    const prefs = { enabled: notifEnabled, hour: notifHour, minute: newMinute };
+    await saveNotificationPrefs(prefs);
+    if (notifEnabled) {
+      await scheduleDailyNotification(notifHour, newMinute);
+    }
+  }, [notifHour, notifMinute, notifEnabled]);
 
   const togglePrayer = useCallback(async (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -212,6 +271,54 @@ export default function DailyScreen() {
                 ]}
               />
             ))}
+          </View>
+        </>
+      )}
+
+      {Platform.OS !== "web" && (
+        <>
+          <Text style={s.sectionTitle}>Mitzvah of the Day</Text>
+          <View style={s.notifCard}>
+            <View style={s.notifRow}>
+              <View style={s.notifIconWrap}>
+                <Ionicons name="notifications-outline" size={20} color={colors.primary} />
+              </View>
+              <View style={s.notifInfo}>
+                <Text style={s.notifTitle}>Daily Reminder</Text>
+                <Text style={s.notifDesc}>Get a mitzvah with a practical example each morning</Text>
+              </View>
+              <Switch
+                value={notifEnabled}
+                onValueChange={handleNotifToggle}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
+            {notifEnabled && (
+              <View style={s.notifTimeRow}>
+                <Ionicons name="time-outline" size={16} color={colors.mutedForeground} />
+                <Text style={s.notifTimeLabel}>Send at</Text>
+                <View style={s.notifTimeControl}>
+                  <TouchableOpacity onPress={() => adjustHour(-1)} style={s.notifStepBtn}>
+                    <Ionicons name="chevron-down" size={16} color={colors.primary} />
+                  </TouchableOpacity>
+                  <Text style={s.notifTimeValue}>{String(notifHour).padStart(2, "0")}</Text>
+                  <TouchableOpacity onPress={() => adjustHour(1)} style={s.notifStepBtn}>
+                    <Ionicons name="chevron-up" size={16} color={colors.primary} />
+                  </TouchableOpacity>
+                </View>
+                <Text style={s.notifTimeSep}>:</Text>
+                <View style={s.notifTimeControl}>
+                  <TouchableOpacity onPress={() => adjustMinute(-5)} style={s.notifStepBtn}>
+                    <Ionicons name="chevron-down" size={16} color={colors.primary} />
+                  </TouchableOpacity>
+                  <Text style={s.notifTimeValue}>{String(notifMinute).padStart(2, "0")}</Text>
+                  <TouchableOpacity onPress={() => adjustMinute(5)} style={s.notifStepBtn}>
+                    <Ionicons name="chevron-up" size={16} color={colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </>
       )}
@@ -522,5 +629,84 @@ const styles = (colors: ReturnType<typeof useColors>) =>
     },
     taskDelete: {
       padding: 4,
+    },
+    notifCard: {
+      marginHorizontal: 12,
+      marginBottom: 8,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: "hidden",
+    },
+    notifRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 14,
+      gap: 12,
+    },
+    notifIconWrap: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: colors.muted,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    notifInfo: {
+      flex: 1,
+    },
+    notifTitle: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.foreground,
+      fontFamily: "Inter_600SemiBold",
+    },
+    notifDesc: {
+      fontSize: 12,
+      color: colors.mutedForeground,
+      fontFamily: "Inter_400Regular",
+      marginTop: 2,
+    },
+    notifTimeRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 14,
+      paddingBottom: 14,
+      gap: 8,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+      paddingTop: 12,
+    },
+    notifTimeLabel: {
+      fontSize: 13,
+      color: colors.mutedForeground,
+      fontFamily: "Inter_400Regular",
+      marginRight: 4,
+    },
+    notifTimeControl: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.muted,
+      borderRadius: 8,
+      paddingHorizontal: 2,
+      gap: 2,
+    },
+    notifStepBtn: {
+      padding: 6,
+    },
+    notifTimeValue: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.foreground,
+      fontFamily: "Inter_700Bold",
+      minWidth: 26,
+      textAlign: "center",
+    },
+    notifTimeSep: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.foreground,
+      fontFamily: "Inter_700Bold",
     },
   });
