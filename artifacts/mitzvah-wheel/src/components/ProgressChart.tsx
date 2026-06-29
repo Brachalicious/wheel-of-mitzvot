@@ -5,6 +5,7 @@ import { useHebrewDate } from "@/hooks/use-hebrew-date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, TrendingUp, Award, Share2, Copy, Check, Users } from "lucide-react";
+import { SyncHistory } from "@/components/SyncHistory";
 
 const PARSHA_ORDER = [
   // Bereishit (Genesis)
@@ -254,6 +255,8 @@ export function ProgressChart() {
             <p className="text-xs mt-1">Spin the wheel or browse the list and mark mitzvot as done.</p>
           </div>
         )}
+
+        <SyncHistory />
       </div>
     </ScrollArea>
   );
