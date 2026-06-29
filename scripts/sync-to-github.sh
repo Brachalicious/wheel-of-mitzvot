@@ -30,20 +30,8 @@ log_sync() {
 
 # Send a failure notification via webhook (Slack-compatible format).
 # Silently skips if NOTIFY_WEBHOOK_URL is not set.
-notify_failure() {
-  local message="$1"
-  if [ -z "${NOTIFY_WEBHOOK_URL:-}" ]; then
-    return 0
-  fi
-
-  local payload
-  payload=$(printf '{"text":":x: *GitHub sync failed* — %s\nCheck the post-merge logs for details."}' "$message")
-
-  curl -s -o /dev/null -X POST \
-    -H "Content-Type: application/json" \
-    -d "$payload" \
-    "$NOTIFY_WEBHOOK_URL" || true
-}
+# shellcheck source=lib/notify-failure.sh
+source "$SCRIPT_DIR/lib/notify-failure.sh"
 
 if [ -z "${GITHUB_TOKEN:-}" ]; then
   echo "[github-sync] GITHUB_TOKEN not set — skipping."
