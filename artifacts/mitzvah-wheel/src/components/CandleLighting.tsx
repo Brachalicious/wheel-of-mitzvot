@@ -33,7 +33,8 @@ const STORAGE_KEY = "mitzvah-wheel-candle-location";
 const CACHE_KEY   = "mitzvah-wheel-shabbat-cache";
 
 function fmtTime(d: Date): string {
-  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const rounded = new Date(Math.round(d.getTime() / 60_000) * 60_000);
+  return rounded.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
 function fmtDate(d: Date): string {
