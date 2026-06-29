@@ -27,11 +27,11 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Plus, RotateCcw, Star, Shuffle, ExternalLink, CheckCircle2, XCircle, ListChecks, BarChart2, Users, BookOpen, Bell } from "lucide-react";
 import { SiddurBrowser } from "@/components/SiddurBrowser";
-import { CandleLightingBadge } from "@/components/CandleLighting";
+import { CandleLighting, CandleLightingBadge } from "@/components/CandleLighting";
 
 const WHEEL_SLOT_COUNT = 48;
 
-type Tab = "wheel" | "daily" | "siddur" | "progress" | "group" | "reminders";
+type Tab = "wheel" | "daily" | "siddur" | "shabbat" | "progress" | "group" | "reminders";
 
 function pickRandom(arr: string[], n: number): string[] {
   const shuffled = [...arr].sort(() => Math.random() - 0.5);
@@ -164,14 +164,15 @@ export default function Home() {
 
       {/* Tab bar */}
       <div className="flex-shrink-0 flex border-b border-border bg-muted/30 overflow-x-auto">
-        {(["wheel", "daily", "siddur", "reminders", "progress", "group"] as Tab[]).map((t) => {
+        {(["wheel", "daily", "siddur", "shabbat", "reminders", "progress", "group"] as Tab[]).map((t) => {
           const labels: Record<Tab, string> = {
-            wheel: "Wheel", daily: "Daily", siddur: "Siddur", reminders: "Reminders", progress: "Progress", group: "Group",
+            wheel: "Wheel", daily: "Daily", siddur: "Siddur", shabbat: "Shabbat", reminders: "Reminders", progress: "Progress", group: "Group",
           };
           const icons: Record<Tab, React.ReactNode> = {
             wheel: <Shuffle className="w-3.5 h-3.5" />,
             daily: <ListChecks className="w-3.5 h-3.5" />,
             siddur: <BookOpen className="w-3.5 h-3.5" />,
+            shabbat: <span className="text-sm leading-none">🕯️</span>,
             reminders: <Bell className="w-3.5 h-3.5" />,
             progress: <BarChart2 className="w-3.5 h-3.5" />,
             group: <Users className="w-3.5 h-3.5" />,
@@ -198,6 +199,14 @@ export default function Home() {
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="p-4">
             <SiddurBrowser />
+          </div>
+        </div>
+      )}
+
+      {tab === "shabbat" && (
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="p-4 max-w-lg mx-auto">
+            <CandleLighting />
           </div>
         </div>
       )}
